@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="eo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-stacio · 世语译站</title>
+  <style>
+    /* ===== 全局样式 – 绿色系 ===== */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg: #f0f7f0;
+      --card: #ffffff;
+      --primary: #2a7a4a;
+      --primary-light: #4a9a6a;
+      --primary-dark: #1a5a2a;
+      --accent: #d4a040;
+      --accent-light: #e8c870;
+      --text: #1e3a1e;
+      --text-light: #4a6a4a;
+      --border: #c8dcc8;
+      --shadow: 0 8px 24px rgba(0,40,0,0.08);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+      --transition: 0.2s ease;
+    }
+    body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; display:flex; justify-content:center; padding:24px 16px; }
+    #app { max-width:1600px; width:100%; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px 24px 32px; }
+
+    /* ===== 头部 ===== */
+    .header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px 16px; margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:14px; }
+    .logo { font-size:2rem; font-weight:700; color:var(--primary-dark); display:flex; align-items:baseline; gap:2px; }
+    .logo .staci-ruby { display:inline-flex; flex-direction:column; align-items:center; font-size:2rem; line-height:1.2; }
+    .logo .staci-ruby rt { font-size:0.7rem; font-weight:400; color:var(--primary-light); letter-spacing:0.5px; }
+    .logo .sub { font-size:0.9rem; font-weight:400; color:var(--text-light); margin-left:8px; }
+    .mode-switch { display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:30px; flex-wrap:wrap; }
+    .mode-btn { border:none; background:transparent; padding:6px 16px; border-radius:30px; font-size:0.85rem; font-weight:500; color:var(--text-light); cursor:pointer; transition:var(--transition); }
+    .mode-btn.active { background:var(--primary); color:#fff; box-shadow:0 2px 8px rgba(42,122,74,0.3); }
+    .mode-btn:hover:not(.active) { background:#dce8dc; }
+    .mode-btn.admin { color:var(--accent); }
+    .mode-btn.admin.active { background:var(--accent); color:#fff; }
+
+    /* ===== 设置栏 ===== */
+    .settings { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; background:#f8fbf8; padding:10px 16px; border-radius:12px; margin-bottom:16px; border:1px solid var(--border); }
+    .settings label { font-size:0.85rem; font-weight:500; color:var(--text-light); display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .settings select { padding:4px 8px; border-radius:var(--radius-sm); border:1px solid var(--border); background:#fff; font-size:0.85rem; color:var(--text); cursor:pointer; }
+    .settings .btn-icon { border:none; background:var(--primary); color:#fff; padding:6px 14px; border-radius:30px; font-size:0.85rem; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:4px; }
+    .settings .btn-icon:hover { background:var(--primary-dark); }
+    .settings .btn-icon.secondary { background:var(--bg); color:var(--text); border:1px solid var(--border); }
+    .settings .btn-icon.secondary:hover { background:var(--border); }
+    .settings .toggle-group { display:flex; gap:0; border-radius:30px; overflow:hidden; border:1px solid var(--border); }
+    .settings .toggle-group button { border:none; background:#fff; padding:4px 14px; font-size:0.8rem; cursor:pointer; transition:var(--transition); color:var(--text-light); }
+    .settings .toggle-group button.active { background:var(--primary); color:#fff; }
+    .settings .toggle-group button:first-child { border-right:1px solid var(--border); }
+
+    /* ===== 进度条（已删除） ===== */
+
+    /* ===== 句子卡片 ===== */
+    .sentence-card { background:var(--bg); border-radius:var(--radius); padding:24px 20px 20px; margin-bottom:16px; border:2px solid transparent; transition:var(--transition); }
+    .sentence-card.editing { border-color:var(--accent-light); background:#fcf9f0; }
+    .sentence-number { font-size:0.75rem; color:var(--text-light); margin-bottom:8px; font-weight:500; letter-spacing:0.3px; }
+    .morfemoj-row { display:flex; flex-wrap:wrap; gap:12px 8px; padding:8px 0 12px; min-height:64px; align-items:flex-end; }
+    .morfemo-item {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      cursor:pointer;
+      padding:2px 4px;
+      border-radius:var(--radius-sm);
+      transition:var(--transition);
+      min-width:28px;
+    }
+    .morfemo-item:hover { background:rgba(42,122,74,0.08); }
+    .morfemo-item .glyph {
+      font-size:0.75rem;
+      font-weight:400;
+      color:var(--text-light);
+      line-height:1.2;
+      letter-spacing:0.3px;
+      padding-bottom:1px;
+    }
+    .morfemo-item .repl {
+      font-size:1.5rem;
+      font-weight:600;
+      color:var(--primary-dark);
+      line-height:1.3;
+      min-height:2.2rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 2px;
+    }
+    .morfemo-item .repl.empty { color:var(--text-light); opacity:0.4; font-weight:300; }
+    .morfemo-item .repl.conflict { color:#c0392b; }
+
+    .sentence-translation { font-size:0.95rem; color:var(--text-light); padding-top:12px; border-top:1px dashed var(--border); margin-top:4px; font-style:italic; }
+    .sentence-translation .lang-tag { font-style:normal; font-weight:500; font-size:0.7rem; background:var(--border); padding:0 8px; border-radius:12px; margin-right:6px; }
+
+    /* ===== 编辑器 ===== */
+    .editor-panel { background:#fff; border-radius:var(--radius-sm); padding:16px 18px; margin-top:8px; border:1px solid var(--border); display:none; animation:slideDown 0.2s ease; }
+    .editor-panel.open { display:block; }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .editor-panel .editor-label { font-size:0.8rem; color:var(--text-light); margin-bottom:6px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+    .editor-panel .editor-label .morfemo-ref { font-weight:600; color:var(--text); }
+    .editor-panel .editor-input-group { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .editor-panel input { flex:1; min-width:120px; padding:8px 14px; border:2px solid var(--border); border-radius:var(--radius-sm); font-size:1rem; transition:var(--transition); background:#fafafa; }
+    .editor-panel input:focus { outline:none; border-color:var(--primary); background:#fff; }
+    .editor-panel .editor-actions { display:flex; gap:6px; }
+    .editor-panel .editor-actions button { border:none; padding:8px 16px; border-radius:var(--radius-sm); font-size:0.85rem; cursor:pointer; font-weight:500; transition:var(--transition); }
+    .editor-panel .btn-save { background:var(--primary); color:#fff; }
+    .editor-panel .btn-save:hover { background:var(--primary-dark); }
+    .editor-panel .btn-clear { background:var(--bg); color:var(--text-light); }
+    .editor-panel .btn-clear:hover { background:var(--border); }
+    .editor-panel .btn-close { background:transparent; color:var(--text-light); padding:8px 12px; }
+    .editor-panel .btn-close:hover { color:var(--text); }
+    .editor-panel .suggestions { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+    .editor-panel .suggestions .sug-label { font-size:0.75rem; color:var(--text-light); margin-right:4px; }
+    .editor-panel .suggestions .sug-tag { background:var(--bg); padding:2px 12px; border-radius:20px; font-size:0.8rem; cursor:pointer; border:1px solid var(--border); color:var(--text); transition:var(--transition); }
+    .editor-panel .suggestions .sug-tag:hover { background:var(--primary-light); color:#fff; border-color:var(--primary-light); }
+    .editor-other-examples { margin-top:12px; padding-top:10px; border-top:1px dashed var(--border); font-size:0.8rem; color:var(--text-light); max-height:150px; overflow-y:auto; }
+    .editor-other-examples .example-item { padding:3px 0; display:flex; gap:8px; align-items:baseline; }
+    .editor-other-examples .example-item .ex-id { font-weight:500; color:var(--primary); min-width:30px; }
+    .editor-other-examples .example-item .ex-text { color:var(--text); }
+    .editor-other-examples .example-item .ex-text strong { color:var(--primary-dark); font-weight:700; }
+
+    /* ===== 管理面板 ===== */
+    .admin-panel { background:#fefaf0; border-radius:var(--radius); padding:18px 20px; margin-top:16px; border:2px solid var(--accent-light); display:none; }
+    .admin-panel.open { display:block; }
+    .admin-panel h4 { font-size:0.9rem; color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .admin-panel .admin-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+    .admin-panel .admin-row button { border:none; padding:6px 18px; border-radius:var(--radius-sm); font-size:0.8rem; cursor:pointer; font-weight:500; transition:var(--transition); }
+    .admin-panel .admin-row .btn-admin { background:var(--accent); color:#fff; }
+    .admin-panel .admin-row .btn-admin:hover { background:#b08020; }
+    .admin-panel .admin-row .btn-admin-outline { background:transparent; border:1px solid var(--accent); color:var(--accent); }
+    .admin-panel .admin-row .btn-admin-outline:hover { background:var(--accent); color:#fff; }
+    .admin-panel .admin-row .btn-danger { background:#c0392b; color:#fff; }
+    .admin-panel .admin-row .btn-danger:hover { background:#a93226; }
+    .admin-panel .morfemo-edit-list { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; padding:10px; background:#fff; border-radius:var(--radius-sm); border:1px solid var(--border); }
+    .admin-panel .morfemo-edit-item { display:flex; align-items:center; gap:4px; background:var(--bg); padding:2px 8px 2px 6px; border-radius:20px; font-size:0.8rem; flex-wrap:wrap; }
+    .admin-panel .morfemo-edit-item input { width:50px; padding:2px 4px; border:1px solid var(--border); border-radius:4px; font-size:0.8rem; }
+    .admin-panel .morfemo-edit-item input.display-input { width:70px; }
+    .admin-panel .morfemo-edit-item input.base-input { width:70px; }
+    .admin-panel .morfemo-edit-item input.number-input { width:40px; }
+    .admin-panel .morfemo-edit-item .del-btn { background:transparent; border:none; color:#c0392b; cursor:pointer; font-size:0.9rem; padding:0 2px; }
+    .admin-panel .admin-add-morfemo { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .admin-panel .admin-add-morfemo input { padding:4px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.8rem; width:100px; }
+    .admin-panel .admin-add-morfemo button { padding:4px 14px; border:none; background:var(--primary); color:#fff; border-radius:var(--radius-sm); cursor:pointer; font-size:0.8rem; }
+
+    /* ===== 底部导航 ===== */
+    .nav-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border); flex-wrap:wrap; }
+    .nav-footer .nav-buttons { display:flex; gap:8px; }
+    .nav-footer .nav-buttons button { border:none; padding:8px 22px; border-radius:30px; font-size:0.9rem; cursor:pointer; font-weight:500; background:var(--bg); color:var(--text); transition:var(--transition); }
+    .nav-footer .nav-buttons button:hover:not(:disabled) { background:var(--primary); color:#fff; }
+    .nav-footer .nav-buttons button:disabled { opacity:0.35; cursor:not-allowed; }
+    .nav-footer .sentence-counter { font-size:0.85rem; color:var(--text-light); }
+    .nav-footer .sentence-counter input[type=number]::-webkit-inner-spin-button,
+    .nav-footer .sentence-counter input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none; margin:0;
+    }
+    .nav-footer .sentence-counter input[type=number] {
+      appearance: textfield;
+      -moz-appearance:textfield;
+    }
+
+    /* ===== Toast ===== */
+    .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--primary-dark); color:#fff; padding:12px 28px; border-radius:40px; font-size:0.9rem; box-shadow:0 8px 32px rgba(0,0,0,0.18); opacity:0; transition:opacity 0.3s ease, transform 0.3s ease; pointer-events:none; z-index:999; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.error { background:#c0392b; }
+    .toast.success { background:var(--primary); }
+
+    /* ===== 响应式 ===== */
+    @media (max-width:600px) {
+      #app { padding:16px 12px; }
+      .header { flex-direction:column; align-items:stretch; }
+      .logo { font-size:1.6rem; justify-content:center; }
+      .mode-switch { justify-content:center; }
+      .settings { flex-direction:column; align-items:stretch; }
+      .settings label { justify-content:space-between; }
+      .morfemoj-row { gap:8px 4px; }
+      .morfemo-item { min-width:24px; }
+      .morfemo-item .repl { font-size:1.2rem; min-height:1.8rem; }
+      .morfemo-item .glyph { font-size:0.65rem; }
+      .sentence-card { padding:16px 12px; }
+      .editor-panel .editor-input-group { flex-direction:column; align-items:stretch; }
+      .nav-footer { flex-direction:column; align-items:stretch; }
+      .nav-footer .nav-buttons { justify-content:center; }
+      .nav-footer .sentence-counter { text-align:center; }
+      .admin-panel .admin-row { flex-direction:column; }
+      .admin-panel .admin-row button { width:100%; }
+    }
+
+    /* ===== 词汇表 ===== */
+    .glossary-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+    .glossary-header h3 { font-size:1rem; color:var(--primary); margin:0; }
+    .glossary-sort { display:flex; gap:4px; }
+    .glossary-sort button { border:1px solid var(--border); background:var(--card); padding:4px 14px; border-radius:20px; font-size:0.75rem; cursor:pointer; color:var(--text-light); }
+    .glossary-sort button.active { background:var(--primary); color:#fff; }
+    .glossary-section { margin-bottom:24px; }
+    .glossary-section h4 { font-size:0.85rem; color:var(--text-light); margin-bottom:10px; border-bottom:1px solid var(--border); }
+    .glossary-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .glossary-table td { padding:5px 8px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    .glossary-table tr:hover td { background:rgba(42,122,74,0.04); }
+    .glossary-base { font-family:monospace; font-weight:500; }
+    .glossary-n { font-size:0.7rem; color:var(--text-light); background:var(--bg); padding:1px 6px; border-radius:8px; }
+    .glossary-repl { font-size:1.1rem; font-weight:500; color:var(--primary-dark); }
+    .glossary-repl.empty { color:var(--text-light); opacity:0.4; }
+    .glossary-comm-popup { display:none; position:absolute; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:6px 10px; box-shadow:0 4px 16px rgba(0,0,0,.12); z-index:100; white-space:nowrap; }
+    .glossary-repl-cell { position:relative; cursor:default; }
+    .glossary-repl-cell:hover .glossary-comm-popup { display:block; }
+    .glossary-comm-item { display:inline-block; margin:2px 4px; background:var(--bg); padding:1px 8px; border-radius:10px; }
+    .glossary-comm-item .char { font-weight:500; }
+    .glossary-comm-item .count { color:var(--text-light); font-size:0.7rem; }
+
+    /* ===== 抽屉式侧边栏 ===== */
+    .app-with-sidebar { display:block; }
+    .sidebar {
+      position: fixed; top:0; left:0;
+      width: 340px; max-width: 85vw; height: 100vh;
+      background: var(--card); box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+      z-index: 1100; padding: 16px 16px 24px;
+      transform: translateX(-100%); transition: transform 0.25s ease;
+      overflow-y: auto; border-radius: 0; border: none; font-size: 0.8rem;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+    .sidebar-header h3 { font-size:0.95rem; color:var(--primary); margin:0; }
+    .sidebar-close { border:none; background:transparent; font-size:1.4rem; line-height:1; color:var(--text-light); cursor:pointer; padding:0 4px; }
+    .sidebar-close:hover { color:var(--primary); }
+    .sidebar h4 { font-size:0.85rem; color:var(--primary); margin:0 0 8px; display:flex; justify-content:space-between; align-items:center; }
+    .sidebar select { width:100%; height:260px; font-size:0.75rem; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--card); color:var(--text); }
+    .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:1099; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
+    .drawer-overlay.open { opacity:1; pointer-events:auto; }
+    .main-content { width:100%; }
+    @media(max-width:600px) { .sidebar { width:100%; max-width:100%; } }
+
+    /* ===== 词汇表网格 ===== */
+    .glossary-grid-wrap { margin-top:0; padding-top:0; border-top:none; }
+    .glossary-grid-wrap h3 { font-size:0.9rem; color:var(--primary); margin:0 0 10px; }
+    .glossary-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(62px, 1fr)); gap:6px; }
+    .glossary-item { position:relative; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center; cursor:pointer; transition:var(--transition); font-size:0.8rem; }
+    .glossary-item:hover { border-color:var(--primary-light); box-shadow:0 2px 8px rgba(42,122,74,.12); }
+    .glossary-item .glyph { display:block; font-size:1.1rem; font-weight:500; color:var(--text); }
+    .glossary-item .repl { display:block; font-size:1rem; font-weight:500; color:var(--primary-dark); margin-top:2px; min-height:1.2em; }
+    .glossary-item .repl.empty { color:var(--text-light); opacity:0.4; }
+    .glossary-item .n-badge { position:absolute; top:-4px; right:-4px; background:var(--accent); color:#fff; font-size:0.65rem; font-weight:700; padding:1px 6px; border-radius:8px; line-height:1.3; min-width:18px; text-align:center; }
+    .glossary-section-label { font-size:0.75rem; color:var(--text-light); margin:12px 0 6px; font-weight:500; }
+
+    /* ===== 例句弹窗 ===== */
+    .glossary-popup-overlay { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,.2); z-index:999; }
+    .glossary-popup-overlay.open { display:block; }
+    .glossary-popup { display:none; position:fixed; top:50%;left:50%; transform:translate(-50%,-50%); background:var(--card); border-radius:var(--radius); box-shadow:0 8px 40px rgba(0,0,0,.2); padding:20px 24px; z-index:1000; max-width:520px; width:90%; max-height:70vh; overflow-y:auto; }
+    .glossary-popup.open { display:block; }
+    .glossary-popup h4 { font-size:0.9rem; color:var(--primary); margin:0 0 12px; }
+    .glossary-popup .close-popup { float:right; border:none; background:transparent; font-size:1.2rem; cursor:pointer; color:var(--text-light); padding:0 4px; }
+    .glossary-popup .popup-sent { padding:6px 0; border-bottom:1px solid var(--border); font-size:0.8rem; }
+    .glossary-popup .popup-sent:last-child { border-bottom:none; }
+    .glossary-popup .popup-sent .sid { font-weight:500; color:var(--primary); margin-right:6px; }
+    .glossary-popup .popup-sent .stext { color:var(--text); }
+    .glossary-popup .popup-sent .strans { font-size:0.75rem; color:var(--text-light); margin-top:2px; }
+
+  </style>
+</head>
+
+<div class="glossary-popup-overlay" id="popupOverlay" onclick="closeGlossaryPopup()"></div>
+<div class="glossary-popup" id="glossaryPopup"></div>
+
+<body>
+
+<div class="app-with-sidebar" id="app">
+  <!-- ===== 抽屉式侧边栏 ===== -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3 data-i18n="panel_title">Panelo</h3>
+      <button class="sidebar-close" id="sidebarCloseBtn" title="Fermi">&times;</button>
+    </div>
+    <div class="sidebar-section">
+      <h4><span data-i18n="glossary_section_frazoj">Frazoj</span> <button id="sidebarToggleAll" style="font-size:0.7rem;padding:1px 8px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;">Ĉiuj</button></h4>
+      <select id="sentenceSelect" multiple></select>
+    </div>
+    <!-- ===== 词汇表（移入抽屉） ===== -->
+    <div class="glossary-grid-wrap" id="glossaryGridWrap">
+      <h3>Vortprovizo</h3>
+      <div class="glossary-section-label">n=0 — Fundamentaj finaĵoj</div>
+      <div class="glossary-grid" id="glossaryGridN0"></div>
+      <div class="glossary-section-label">n>0 — Ordinaraj morfemoj</div>
+      <div class="glossary-grid" id="glossaryGridNpos"></div>
+    </div>
+  </aside>
+  <div class="main-content">
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== 头部 ===== -->
+    <header class="header">
+      <div class="logo">
+        <span>E</span>
+        <span class="staci-ruby">站<rt>staci</rt></span>
+        <span>o</span>
+        <span class="sub" data-i18n="subtitle"> </span>
+      </div>
+      <div class="mode-switch" id="modeSwitch">
+        <button class="mode-btn active" data-mode="guest" data-i18n="mode_guest">Sensaluti</button>
+        <button class="mode-btn" data-mode="user" data-i18n="mode_user">Ensaluti</button>
+        <button class="mode-btn admin" data-mode="admin" data-i18n="mode_admin">Administri</button>
+      </div>
+    </header>
+
+    <!-- ===== 设置栏 ===== -->
+    <div class="settings">
+      <button class="btn-icon secondary" id="drawerToggle" title="Frazoj / Vortprovizo">☰ <span data-i18n="panel_title">Panelo</span></button>
+      <label>
+        <span data-i18n="label_lang">Lingvo</span>
+        <select id="langSelect">
+          <option value="zh" data-i18n="lang_zh">Ĉina</option>
+          <option value="ja" data-i18n="lang_ja">Japana</option>
+          <option value="en" data-i18n="lang_en">Angla</option>
+        </select>
+      </label>
+      <label>
+        <span data-i18n="label_merge">Pluralo/akuzativo</span>
+        <span class="toggle-group">
+          <button class="active" data-merge="false" data-i18n="merge_split">Divida</button>
+          <button data-merge="true" data-i18n="merge_merge">Kuniga</button>
+        </span>
+      </label>
+      <button class="btn-icon" id="speakBtn" data-i18n="btn_speak">Aŭskulti</button>
+      <button class="btn-icon secondary" id="resetBtn" data-i18n="btn_reset">Restarigi</button>
+    </div>
+
+    <!-- ===== 句子卡片 ===== -->
+    <div class="sentence-card" id="sentenceCard">
+      <div class="sentence-number" id="sentenceNumber">#1</div>
+      <div class="morfemoj-row" id="morfemojRow"></div>
+      <div class="sentence-translation" id="sentenceTranslation">
+        <span class="lang-tag" data-i18n="translation_label">Traduko</span>
+        <span id="translationText">—</span>
+      </div>
+
+      <!-- 编辑器 -->
+      <div class="editor-panel" id="editorPanel">
+        <div class="editor-label">
+          <span><span data-i18n="editor_title">Anstataŭigi morfemon</span>: <span class="morfemo-ref" id="editorRef">—</span></span>
+          <span style="font-size:0.7rem;color:var(--text-light);" data-i18n="editor_hint">Enigu ĉinan signon</span>
+        </div>
+        <div class="editor-input-group">
+          <input type="text" id="editorInput" placeholder="…" maxlength="4" autofocus />
+          <div class="editor-actions">
+            <button class="btn-save" id="editorSave" data-i18n="btn_save">Konservi</button>
+            <button class="btn-clear" id="editorClear" data-i18n="btn_clear">Forigi</button>
+            <button class="btn-close" id="editorClose" data-i18n="btn_close">Fermi</button>
+          </div>
+        </div>
+        <div class="suggestions" id="suggestionsWrap">
+          <span class="sug-label" data-i18n="suggest_label">Elekto de aliaj:</span>
+          <span style="color:var(--text-light);font-size:0.8rem;" id="suggestionsEmpty" data-i18n="suggest_empty">neniu</span>
+        </div>
+        <div class="editor-other-examples" id="otherExamples" style="display:none;">
+          <div style="font-weight:500;margin-bottom:4px;" data-i18n="other_examples_title">Samaj morfemoj en aliaj frazoj:</div>
+          <div id="exampleList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 管理面板 ===== -->
+    <div class="admin-panel" id="adminPanel">
+      <h4><span data-i18n="admin_title">Administra reĝimo — redakti morfemojn</span></h4>
+      <div class="admin-row">
+        <button class="btn-admin" id="adminEditToggle" data-i18n="admin_edit_toggle">Redakti morfemojn</button>
+        <button class="btn-admin-outline" id="adminExport" data-i18n="admin_export">Elporti JSON</button>
+        <button class="btn-admin-outline" id="adminImportBtn" data-i18n="admin_import">Enporti JSON</button>
+        <input type="file" id="adminFileInput" accept=".json" style="display:none;" />
+        <button class="btn-danger" id="adminResetData" data-i18n="admin_reset">Restarigi datumojn</button>
+      </div>
+      <div id="adminEditArea" style="display:none;">
+        <div class="morfemo-edit-list" id="adminMorfemoList"></div>
+        <div class="admin-add-morfemo">
+          <input type="text" id="adminNewD" placeholder="Montrata (d)" />
+          <input type="text" id="adminNewB" placeholder="Baza (b)" />
+          <input type="number" id="adminNewN" placeholder="n" value="0" style="width:60px;" />
+          <button id="adminAddBtn" data-i18n="admin_add">+ Aldoni</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 底部导航 ===== -->
+    <footer class="nav-footer">
+      <span class="sentence-counter">
+        <input type="number" id="sentenceJump" value="1" min="1" style="width:45px;text-align:right;border:none;background:transparent;font:inherit;color:inherit;padding:0;outline:none;" title="输入序号后按 Enter 跳转">
+        <span id="sentenceTotal"> / <span id="totalCount">365</span></span>
+      </span>
+      <div class="nav-buttons">
+        <button id="prevBtn" data-i18n="btn_prev">Antaŭa</button>
+        <button id="nextBtn" data-i18n="btn_next">Posta</button>
+      </div>
+        <div class="copy-buttons" style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+          <button class="btn-icon secondary" id="copyBtnA" data-i18n="copy_a" title="格式A: 汉字替换原形保留" style="padding:2px 12px;font-size:0.75rem">📋 A</button>
+          <button class="btn-icon secondary" id="copyBtnB" data-i18n="copy_b" title="格式B: 括号标注原形" style="padding:2px 12px;font-size:0.75rem">📋 B</button>
+        </div>
+    </footer>
+
+  </div> <!-- /main-content -->
+
+</div> <!-- /app -->
+
+<script src="e-stacio-data.js"></script>
+<script>
+// ============================================================
+// 数据验证 — e-stacio-data.js 提供 I18N, SENTENCES_RAW 等常量
+// ============================================================
+if (typeof I18N === "undefined") {
+    document.body.innerHTML =
+        '<div style="padding:48px 24px;text-align:center;font-family:Segoe UI,system-ui,sans-serif;color:#333">' +
+        '<h1 style="font-size:28px;margin-bottom:8px">E-stacio</h1>' +
+        '<p style="color:#c0392b;font-size:16px">数据文件未加载 / Data file not loaded</p>' +
+        '<p style="margin-top:16px;color:#666">请确认 <code>e-stacio-data.js</code> 与页面在同一目录。</p>' +
+        '<p style="color:#666">Please ensure <code>e-stacio-data.js</code> is in the same directory.</p>' +
+        '<p style="margin-top:20px;font-size:13px;color:#999">(若文件存在，尝试清除浏览器缓存后刷新)</p>' +
+        "</div>";
+    throw new Error('e-stacio-data.js not loaded');
+}
+
+
+// ============================================================
+// 4. APP 状态
+// ============================================================
+const APP = {
+  sentences: [],
+  currentIndex: 0,
+  lang: 'zh',
+  mergeMode: false,        // false = Divida, true = Kuniga
+  mode: 'guest',
+  replacements: {},          // 逐位置覆盖(每句每位置),用于句子重置
+  selectedSentences: null,  // null = all selected
+  globalReplacements: {},    // 当前用户有效汉字映射库(公开库 + 私有覆盖,合并后只读)
+  privateGlobalReplacements: {}, // 当前用户私有汉字映射库(覆盖公开库)
+  publicRepl: {},            // 公开库缓存(从 localStorage 读取,只读)
+  adminEditing: false,
+  adminEditTarget: null,
+  editorOpen: false,
+  editorTarget: null,
+  currentUser: null,
+};
+
+// ============================================================
+// 5. 核心函数: expandiMorfemoj
+// ============================================================
+function expandiMorfemoj(morfemoj, mergeMode) {
+  const result = [];
+  morfemoj.forEach((m, origIdx) => {
+    if (!mergeMode && m.n === 0 && m.b.length > 1) {
+      // 拆分模式：按基本形 b 拆分（忽略 d 中的空格/标点）
+      const baseChars = m.b.split('');
+      const dispChars = m.d.split('');
+      baseChars.forEach((ch, subIdx) => {
+        let dCh = dispChars[subIdx] || ch;
+        // d 比 b 多出的字符（如逗号/句号）追加到最后一项
+        if (subIdx === baseChars.length - 1 && dispChars.length > baseChars.length) {
+          dCh += dispChars.slice(baseChars.length).join('');
+        }
+        result.push({
+          d: dCh,
+          b: ch.toLowerCase(),
+          n: 0,
+          origIdx: origIdx,
+          subIdx: subIdx,
+          isExpanded: true
+        });
+      });
+    } else {
+      // 合并模式 或 非特殊词尾：原样保留
+      result.push({
+        ...m,
+        origIdx: origIdx,
+        subIdx: undefined,
+        isExpanded: false
+      });
+    }
+  });
+  return result;
+}
+
+// ============================================================
+// 6. 工具函数
+// ============================================================
+function getCurrentSentence() { return APP.sentences[APP.currentIndex] || null; }
+
+function getReplacementKey(sId, origIdx, subIdx) {
+  if (subIdx !== undefined && subIdx !== null) return sId + '-' + origIdx + '-' + subIdx;
+  return sId + '-' + origIdx;
+}
+
+function getReplacement(sId, origIdx, subIdx) {
+  const key = getReplacementKey(sId, origIdx, subIdx);
+  const perPosVal = APP.replacements[key];
+  if (perPosVal !== undefined) {
+    if (perPosVal !== '') return perPosVal;
+    return '';
+  }
+  const s = APP.sentences.find(s => s.id === sId);
+  if (s) {
+    const m = s.morfemoj[origIdx];
+    if (m) {
+      let globalKey;
+      if (m.n === 0) {
+        if (subIdx !== undefined && subIdx !== null && m.d.length > 1) {
+          const splitChar = m.d.split('')[subIdx] || m.d;
+          globalKey = splitChar.toLowerCase() + '|0';
+        } else {
+          globalKey = m.d.toLowerCase() + '|0';
+        }
+      } else {
+        globalKey = m.b + '|' + m.n;
+      }
+      const globalVal = APP.globalReplacements[globalKey];
+      if (globalVal !== undefined) return globalVal;
+    }
+  }
+  return '';
+}
+
+// 同步全局替换: 将替换同步到所有相同词元(b 相同且 n 相同)
+// 同时更新当前用户私有映射库;登录/管理模式下写入公开库向其他用户公开
+function syncGlobalReplacement(sId, origIdx, val, subIdx) {
+  const s = APP.sentences.find(s => s.id === sId);
+  if (!s) return;
+  const m = s.morfemoj[origIdx];
+  if (!m) return;
+  let globalKey;
+  if (m.n === 0) {
+    if (subIdx !== undefined && subIdx !== null && m.d.length > 1) {
+      const splitChar = m.d.split('')[subIdx] || m.d;
+      globalKey = splitChar.toLowerCase() + '|0';
+    } else {
+      globalKey = m.d.toLowerCase() + '|0';
+    }
+  } else {
+    globalKey = m.b + '|' + m.n;
+  }
+  // 写入当前用户私有映射库
+  if (val && val.trim()) {
+    APP.privateGlobalReplacements[globalKey] = val.trim();
+  } else {
+    delete APP.privateGlobalReplacements[globalKey];
+  }
+  // 登录/管理模式下,写入公开库向其他用户公开
+  if (APP.mode === 'user' || APP.mode === 'admin') {
+    savePublicRepl(globalKey, val && val.trim() ? val.trim() : null);
+  }
+  // 重新合并生成有效映射库
+  mergeGlobalReplacements();
+  // 持久化私有库
+  if (APP.mode === 'user') saveUserData();
+  else saveState();
+}
+
+// 合并公开库与私有库:私有覆盖公开
+function mergeGlobalReplacements() {
+  APP.globalReplacements = Object.assign({}, APP.publicRepl, APP.privateGlobalReplacements);
+}
+
+function setReplacement(sId, origIdx, val, subIdx) {
+  const key = getReplacementKey(sId, origIdx, subIdx);
+  if (val && val.trim()) {
+    APP.replacements[key] = val.trim();
+  } else {
+    APP.replacements[key] = '';
+  }
+  // 触发同词素全局同步(写私有库 + 公开库 + 合并)
+  syncGlobalReplacement(sId, origIdx, val, subIdx);
+  renderAll();
+}
+
+function getTranslation(sentence, lang) {
+  return sentence.translations[lang] || sentence.translations.zh || '—';
+}
+
+// ============================================================
+// 7. 数据持久化
+// ============================================================
+const STATE_KEY = 'e-stacio-state';
+const SENTENCE_KEY = 'e-stacio-sentences';
+const PUBLIC_KEY = 'e-stacio-public';
+
+// 加载公开库(所有用户共享,由登录/管理模式的用户贡献)
+function loadPublicRepl() {
+  try {
+    const raw = localStorage.getItem(PUBLIC_KEY);
+    APP.publicRepl = raw ? JSON.parse(raw) : {};
+  } catch (_) { APP.publicRepl = {}; }
+}
+
+// 写入单条公开库记录(val 为 null 表示删除)
+function savePublicRepl(key, val) {
+  if (val) APP.publicRepl[key] = val;
+  else delete APP.publicRepl[key];
+  try { localStorage.setItem(PUBLIC_KEY, JSON.stringify(APP.publicRepl)); } catch (_) {}
+}
+
+function saveState() {
+  try {
+    const data = {
+      replacements: APP.replacements,
+      privateGlobalReplacements: APP.privateGlobalReplacements,
+      lang: APP.lang,
+      mergeMode: APP.mergeMode,
+      mode: APP.mode,
+      currentIndex: APP.currentIndex,
+      currentUser: APP.currentUser,
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(data));
+  } catch (_) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    APP.replacements = data.replacements || {};
+    // 兼容旧数据:旧的 globalReplacements 迁移为 private
+    if (data.privateGlobalReplacements) {
+      APP.privateGlobalReplacements = data.privateGlobalReplacements;
+    } else if (data.globalReplacements) {
+      APP.privateGlobalReplacements = data.globalReplacements;
+    } else {
+      APP.privateGlobalReplacements = {};
+    }
+    APP.lang = data.lang || 'zh';
+    APP.mergeMode = data.mergeMode || false;
+    APP.mode = data.mode || 'guest';
+    APP.currentIndex = data.currentIndex || 0;
+    APP.currentUser = data.currentUser || null;
+    mergeGlobalReplacements();
+  } catch (_) {}
+}
+
+function saveUserData() {
+  if (APP.mode === 'user' && APP.currentUser) {
+    const userKey = 'user-' + APP.currentUser;
+    try { localStorage.setItem(userKey, JSON.stringify({
+      replacements: APP.replacements,
+      privateGlobalReplacements: APP.privateGlobalReplacements
+    })); } catch (_) {}
+  }
+}
+
+// 返回 { replacements, privateGlobalReplacements } 或 null
+function loadUserData(username) {
+  const userKey = 'user-' + username;
+  try {
+    const raw = localStorage.getItem(userKey);
+    if (raw) {
+      const data = JSON.parse(raw);
+      // 兼容旧数据:旧的 globalReplacements 迁移为 private
+      const priv = data.privateGlobalReplacements || data.globalReplacements || {};
+      return { replacements: data.replacements || {}, privateGlobalReplacements: priv };
+    }
+  } catch (_) {}
+  return null;
+}
+
+function saveSentences() {
+  try { localStorage.setItem(SENTENCE_KEY, JSON.stringify(APP.sentences)); } catch (_) {}
+}
+
+function loadSentences() {
+  try {
+    const raw = localStorage.getItem(SENTENCE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && Array.isArray(data) && data.length > 0) {
+        APP.sentences = data;
+        return true;
+      }
+    }
+  } catch (_) {}
+  return false;
+}
+
+// ============================================================
+// 侧边栏 + 词汇表
+// ============================================================
+function buildSentenceSelect() {
+  var sel = document.getElementById('sentenceSelect');
+  sel.innerHTML = '';
+  APP.sentences.forEach(function(s) {
+    var opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = '#' + (s.id + 1) + ' ' + (s.skill || '');
+    opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', updateGlossary);
+  document.getElementById('sidebarToggleAll').addEventListener('click', function() {
+    var all = Array.from(sel.options).every(function(o) { return o.selected; });
+    Array.from(sel.options).forEach(function(o) { o.selected = !all; });
+    updateGlossary();
+  });
+}
+
+function getSelectedIds() {
+  var sel = document.getElementById('sentenceSelect');
+  if (!sel) return null;
+  var ids = [];
+  Array.from(sel.options).forEach(function(o) { if (o.selected) ids.push(parseInt(o.value)); });
+  return ids.length === sel.options.length ? null : ids;
+}
+
+function updateGlossary() {
+  var selected = getSelectedIds();
+  var map = {};
+  (selected || APP.sentences).forEach(function(id) {
+    var s;
+    if (typeof id === 'object') { s = id; } else { s = APP.sentences.find(function(x) { return x.id === id; }); }
+    if (!s) return;
+    s.morfemoj.forEach(function(m) {
+      var key = m.b + '|' + m.n;
+      if (!map[key]) { map[key] = { b: m.b, n: m.n, sample: m.d, sentIds: [] }; }
+      map[key].sentIds.push(s.id);
+    });
+  });
+  var entries = Object.values(map);
+  entries.sort(function(a,b) { return a.b.localeCompare(b.b) || a.n - b.n; });
+  var n0 = entries.filter(function(e) { return e.n === 0; });
+  var nP = entries.filter(function(e) { return e.n > 0; });
+  renderGlossaryGrid('glossaryGridN0', n0, false);
+  renderGlossaryGrid('glossaryGridNpos', nP, true);
+}
+
+function renderGlossaryGrid(gridId, entries, showN) {
+  var grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = '';
+  entries.forEach(function(e) {
+    var repl = getGlobalRepl(e.b, e.n);
+    var div = document.createElement('div');
+    div.className = 'glossary-item';
+    div.innerHTML = '<span class="glyph">' + e.b + '</span><span class="repl' + (repl?'':' empty') + '">' + (repl || '?') + '</span>' + (showN ? '<span class="n-badge">' + e.n + '</span>' : '');
+    div.addEventListener('click', function() { showGlossaryPopup(e.b, e.n, e.sentIds); });
+    grid.appendChild(div);
+  });
+}
+
+function showGlossaryPopup(b, n, sentIds) {
+  var overlay = document.getElementById('popupOverlay');
+  var popup = document.getElementById('glossaryPopup');
+  if (!overlay || !popup) return;
+  var title = 'b:' + b + (n > 0 ? ' n=' + n : '');
+  var html = '<button class="close-popup" onclick="closeGlossaryPopup()">&times;</button><h4>' + title + '</h4>';
+  var lang = APP.lang || 'zh';
+  sentIds.forEach(function(id) {
+    var s = APP.sentences.find(function(x) { return x.id === id; });
+    if (!s) return;
+    var trans = s.translations[lang] || s.translations.zh || '';
+    var text = s.morfemoj.map(function(m) { return m.d; }).join('');
+    // 点击整行跳转到该例句
+    html += '<div class="popup-sent" style="cursor:pointer;" data-jump-id="' + (id + 1) + '"><span class="sid">#' + (id + 1) + '</span><span class="stext">' + text + '</span><div class="strans">' + trans + '</div></div>';
+  });
+  popup.innerHTML = html;
+  // 绑定点击跳转
+  popup.querySelectorAll('[data-jump-id]').forEach(function(row) {
+    row.addEventListener('click', function() {
+      goToSentence(parseInt(this.getAttribute('data-jump-id')));
+      closeGlossaryPopup();
+      toggleDrawer(true);  // 跳转后收起抽屉,聚焦主页面
+    });
+  });
+  overlay.classList.add('open');
+  popup.classList.add('open');
+}
+
+function closeGlossaryPopup() {
+  document.getElementById('popupOverlay').classList.remove('open');
+  document.getElementById('glossaryPopup').classList.remove('open');
+}
+
+// ============================================================
+// 8. 渲染
+// ============================================================
+function renderAll() {
+  updateGlossary();
+
+  renderSentence();
+
+  renderSettings();
+  renderAdminPanel();
+  renderEditor();
+  updateNavButtons();
+  updateModeButtons();
+
+  updateI18n();
+  updateGlossary();
+}
+
+function updateI18n() {
+  const lang = APP.lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const msg = I18N[key];
+    if (msg) {
+      const eo = msg.eo || msg.zh;
+      const aux = msg[lang] || eo;
+      if (eo === aux) el.textContent = eo;
+      else el.textContent = eo + ' (' + aux + ')';
+    }
+  });
+}
+
+function renderSentence() {
+  const sentence = getCurrentSentence();
+  if (!sentence) {
+    document.getElementById('morfemojRow').innerHTML = '<div style="padding:12px;color:var(--text-light);">Neniom da frazoj</div>';
+    document.getElementById('translationText').textContent = '—';
+    document.getElementById('sentenceNumber').textContent = '#?';
+    return;
+  }
+  document.getElementById('sentenceNumber').textContent = '#' + (sentence.id + 1);
+
+  const trans = getTranslation(sentence, APP.lang);
+  const langNames = { zh:'中文', ja:'日本語', en:'English' };
+  document.getElementById('translationText').textContent = trans;
+  document.querySelector('#sentenceTranslation .lang-tag').textContent = 'Traduko (' + (langNames[APP.lang] || '') + ')';
+
+  const row = document.getElementById('morfemojRow');
+  row.innerHTML = '';
+  const sId = sentence.id;
+
+  // 使用 expandiMorfemoj 获取展开后的词素列表
+  const expanded = expandiMorfemoj(sentence.morfemoj, APP.mergeMode);
+
+  expanded.forEach((item, dispIdx) => {
+    const container = document.createElement('div');
+    container.className = 'morfemo-item';
+    container.dataset.dispIdx = dispIdx;
+    container.dataset.origIdx = item.origIdx;
+    container.dataset.subIdx = item.subIdx !== undefined ? item.subIdx : '';
+
+    // 拉丁注音 (上方)
+    const glyph = document.createElement('div');
+    glyph.className = 'glyph';
+    glyph.textContent = item.d;
+    container.appendChild(glyph);
+
+    // 汉字主体 (下方)
+    const replDiv = document.createElement('div');
+    replDiv.className = 'repl';
+    const repl = getReplacement(sId, item.origIdx, item.subIdx);
+    if (repl) {
+      replDiv.textContent = repl;
+      replDiv.classList.remove('empty');
+    } else {
+      replDiv.textContent = '？';
+      replDiv.classList.add('empty');
+    }
+    container.appendChild(replDiv);
+
+    container.addEventListener('click', () => {
+      openEditor(sId, item.origIdx, item.subIdx);
+    });
+
+    row.appendChild(container);
+  });
+
+  // 高亮管理编辑目标
+  if (APP.adminEditing && APP.adminEditTarget && APP.adminEditTarget.sentenceId === sId) {
+    const items = row.querySelectorAll('.morfemo-item');
+    items.forEach(el => {
+      const origIdx = parseInt(el.dataset.origIdx);
+      if (origIdx === APP.adminEditTarget.morfemoIndex) {
+        el.style.background = 'rgba(212,160,64,0.15)';
+        el.style.borderRadius = '8px';
+      }
+    });
+    document.getElementById('sentenceCard').classList.add('editing');
+  } else {
+    document.getElementById('sentenceCard').classList.remove('editing');
+  }
+}
+
+function renderProgress() {
+  const total = APP.sentences.length;
+  let done = 0;
+  APP.sentences.forEach(s => {
+    let allFilled = true;
+    const expanded = expandiMorfemoj(s.morfemoj, APP.mergeMode);
+    expanded.forEach(item => {
+      if (!getReplacement(s.id, item.origIdx, item.subIdx)) allFilled = false;
+    });
+    if (allFilled) done++;
+  });
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done + ' / ' + total;
+}
+
+function renderSettings() {
+  document.getElementById('langSelect').value = APP.lang;
+  const toggles = document.querySelectorAll('.toggle-group button');
+  toggles.forEach(btn => {
+    const isMerge = btn.dataset.merge === 'true';
+    btn.classList.toggle('active', isMerge === APP.mergeMode);
+  });
+}
+
+function renderAdminPanel() {
+  const panel = document.getElementById('adminPanel');
+  panel.classList.toggle('open', APP.mode === 'admin');
+  if (APP.mode === 'admin') {
+    const sentence = getCurrentSentence();
+    if (sentence) renderAdminMorfemoList(sentence);
+    document.getElementById('adminEditArea').style.display = APP.adminEditing ? 'block' : 'none';
+  }
+}
+
+function renderAdminMorfemoList(sentence) {
+  const list = document.getElementById('adminMorfemoList');
+  list.innerHTML = '';
+  sentence.morfemoj.forEach((m, idx) => {
+    const div = document.createElement('div');
+    div.className = 'morfemo-edit-item';
+    const isTarget = APP.adminEditTarget && APP.adminEditTarget.sentenceId === sentence.id && APP.adminEditTarget.morfemoIndex === idx;
+    if (isTarget) { div.style.border = '2px solid var(--accent)'; div.style.background = '#fef6ed'; }
+    div.innerHTML = `
+      <span>${idx}</span>
+      <input class="display-input" type="text" value="${m.d}" data-field="d" data-idx="${idx}" />
+      <input class="base-input" type="text" value="${m.b}" data-field="b" data-idx="${idx}" />
+      <input class="number-input" type="number" value="${m.n}" data-field="n" data-idx="${idx}" />
+      <button class="del-btn" data-idx="${idx}">✕</button>
+      <button style="border:none;background:var(--primary);color:#fff;border-radius:4px;padding:0 8px;cursor:pointer;font-size:0.7rem;" data-idx="${idx}" data-edit="select">Redakti</button>
+    `;
+    list.appendChild(div);
+
+    div.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('change', (e) => {
+        const idx2 = parseInt(e.target.dataset.idx);
+        const field = e.target.dataset.field;
+        let val = e.target.value;
+        if (field === 'n') val = parseInt(val) || 0;
+        const s = getCurrentSentence();
+        if (s && s.morfemoj[idx2]) {
+          s.morfemoj[idx2][field] = val;
+          saveSentences();
+          renderAll();
+        }
+      });
+    });
+
+    div.querySelector('.del-btn').addEventListener('click', (e) => {
+      const idx2 = parseInt(e.target.dataset.idx);
+      const s = getCurrentSentence();
+      if (s && s.morfemoj.length > 1) {
+        s.morfemoj.splice(idx2, 1);
+        saveSentences();
+        renderAll();
+        showToast('Morfemo forigita', 'success');
+      } else {
+        showToast('Ne eblas forigi la lastan morfemon', 'error');
+      }
+    });
+
+    div.querySelector('[data-edit="select"]').addEventListener('click', (e) => {
+      const idx2 = parseInt(e.target.dataset.idx);
+      APP.adminEditTarget = { sentenceId: sentence.id, morfemoIndex: idx2 };
+      renderAll();
+    });
+  });
+}
+
+function renderEditor() {
+  const panel = document.getElementById('editorPanel');
+  if (APP.editorOpen && APP.editorTarget) {
+    panel.classList.add('open');
+    const s = APP.sentences.find(s => s.id === APP.editorTarget.sentenceId);
+    if (s) {
+      const m = s.morfemoj[APP.editorTarget.morfemoIndex];
+      if (m) {
+        const subIdx = APP.editorTarget.subIndex;
+        const display = subIdx !== undefined ? m.d[subIdx] : m.d;
+        const refText = display + ' (n=' + m.n + (subIdx !== undefined ? '·' + subIdx : '') + ')';
+        document.getElementById('editorRef').textContent = refText;
+        const currentRepl = getReplacement(s.id, APP.editorTarget.morfemoIndex, subIdx);
+        document.getElementById('editorInput').value = currentRepl;
+        document.getElementById('editorInput').focus();
+
+        // 社区建议
+        const wrap = document.getElementById('suggestionsWrap');
+        wrap.innerHTML = '<span class="sug-label" data-i18n="suggest_label">Elekto de aliaj:</span>';
+        const base = m.b;
+        const suggestions = COMMUNITY_DATA[base] || {};
+        const entries = Object.entries(suggestions).sort((a,b) => b[1] - a[1]);
+        if (entries.length > 0) {
+          entries.slice(0,4).forEach(([char, count]) => {
+            const tag = document.createElement('span');
+            tag.className = 'sug-tag';
+            tag.textContent = char + ' (' + count + ')';
+            tag.addEventListener('click', () => { document.getElementById('editorInput').value = char; });
+            wrap.appendChild(tag);
+          });
+        } else {
+          const empty = document.createElement('span');
+          empty.style.color = 'var(--text-light)'; empty.style.fontSize = '0.8rem';
+          empty.textContent = 'neniu';
+          wrap.appendChild(empty);
+        }
+
+        // 其他例句
+        const otherDiv = document.getElementById('otherExamples');
+        if (subIdx === undefined || (m.n === 0 && subIdx !== undefined && subIdx !== null)) {
+          otherDiv.style.display = 'block';
+          const list = document.getElementById('exampleList');
+          const splitCh = (subIdx !== undefined && subIdx !== null && m.n === 0 && m.d.length > 1) ? m.d.split('')[subIdx].toLowerCase() : null;
+          list.innerHTML = '';
+          APP.sentences.forEach(other => {
+            other.morfemoj.forEach((om, oi) => {
+              if (om.b === m.b && om.n === m.n && !(other.id === s.id && oi === APP.editorTarget.morfemoIndex)) {
+                const item = document.createElement('div');
+                item.className = 'example-item';
+                const idSpan = document.createElement('span');
+                idSpan.className = 'ex-id';
+                idSpan.textContent = '#' + (other.id + 1);
+                const textSpan = document.createElement('span');
+                textSpan.className = 'ex-text';
+                const parts = other.morfemoj.map((om2, oi2) => {
+                  if (om2.b === m.b && om2.n === m.n) {
+                    return '<strong>' + om2.d + '</strong>';
+                  } else {
+                    return om2.d;
+                  }
+                });
+                textSpan.innerHTML = parts.join(' ');
+                item.appendChild(idSpan);
+                item.appendChild(textSpan);
+                list.appendChild(item);
+              }
+            });
+          });
+          if (list.children.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.color = 'var(--text-light)';
+            emptyMsg.textContent = 'Neniuj aliaj ekzemploj.';
+            list.appendChild(emptyMsg);
+          }
+        } else {
+          otherDiv.style.display = 'none';
+        }
+
+        document.getElementById('editorClear').style.display = currentRepl ? 'inline-block' : 'none';
+      }
+    }
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function updateNavButtons() {
+  const total = APP.sentences.length;
+  document.getElementById('prevBtn').disabled = APP.currentIndex <= 0;
+  document.getElementById('nextBtn').disabled = APP.currentIndex >= total - 1;
+
+  var jump = document.getElementById('sentenceJump');
+  if (jump) jump.value = APP.currentIndex + 1;
+  var tc = document.getElementById('totalCount');
+  if (tc) tc.textContent = total;
+}
+
+function updateModeButtons() {
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === APP.mode);
+  });
+
+  renderAdminPanel();
+}
+
+// ============================================================
+// 9. 编辑器操作
+// ============================================================
+function openEditor(sId, origIdx, subIdx) {
+  if (APP.mode === 'admin' && APP.adminEditing) {
+    APP.adminEditTarget = { sentenceId: sId, morfemoIndex: origIdx };
+    renderAll();
+    return;
+  }
+  APP.editorOpen = true;
+  APP.editorTarget = { sentenceId: sId, morfemoIndex: origIdx, subIndex: subIdx };
+  renderAll();
+  setTimeout(() => { document.getElementById('editorInput').focus(); }, 50);
+}
+
+function closeEditor() {
+  APP.editorOpen = false;
+  APP.editorTarget = null;
+  renderAll();
+}
+
+function saveEditor() {
+  if (!APP.editorTarget) return;
+  const { sentenceId, morfemoIndex, subIndex } = APP.editorTarget;
+  const val = document.getElementById('editorInput').value.trim();
+  syncGlobalReplacement(sentenceId, morfemoIndex, val, subIndex);
+  setReplacement(sentenceId, morfemoIndex, val, subIndex);
+  closeEditor();
+  showToast('Anstataŭigo konservita', 'success');
+}
+
+function clearEditor() {
+  if (!APP.editorTarget) return;
+  const { sentenceId, morfemoIndex, subIndex } = APP.editorTarget;
+  syncGlobalReplacement(sentenceId, morfemoIndex, '', subIndex);
+  setReplacement(sentenceId, morfemoIndex, '', subIndex);
+  closeEditor();
+  showToast('Anstataŭigo forigita', 'success');
+}
+
+// ============================================================
+// 10. 导航
+// ============================================================
+function goToSentence(n) {
+  n = parseInt(n);
+  if (isNaN(n) || n < 1 || n > APP.sentences.length) return;
+  APP.currentIndex = n - 1;
+  closeEditor();
+  renderAll();
+}
+function goToPrev() {
+  if (APP._navigating) return; APP._navigating = true;
+  if (APP.currentIndex > 0) { APP.currentIndex--; closeEditor(); renderAll(); }
+  APP._navigating = false;
+}
+function goToNext() {
+  if (APP._navigating) return; APP._navigating = true;
+  if (APP.currentIndex < APP.sentences.length - 1) { APP.currentIndex++; closeEditor(); renderAll(); }
+  APP._navigating = false;
+}
+
+// ============================================================
+// 11. 语音
+// ============================================================
+function speakCurrent() {
+  const s = getCurrentSentence();
+  if (!s) return;
+  const text = s.morfemoj.map(m => m.d).join(' ');
+  if ('speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'eo'; u.rate = 0.85; u.pitch = 1;
+    window.speechSynthesis.speak(u);
+    showToast('Aŭskultado…', 'success');
+  } else {
+    showToast('Via retumilo ne subtenas voĉsintezon.', 'error');
+  }
+}
+
+function getGlobalRepl(b, n) {
+  if (n > 0) return APP.globalReplacements[b + '|' + n] || '';
+  return APP.globalReplacements[b.toLowerCase() + '|0'] || '';
+}
+
+// ============================================================
+// 抽屉式侧边栏
+// ============================================================
+function toggleDrawer(forceClose) {
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('drawerOverlay');
+  if (!sb || !ov) return;
+  var isOpen = sb.classList.contains('open');
+  var shouldOpen = forceClose ? false : !isOpen;
+  sb.classList.toggle('open', shouldOpen);
+  ov.classList.toggle('open', shouldOpen);
+}
+
+// ============================================================
+// 12. 模式切换
+// ============================================================
+function setMode(mode) {
+  // 保存当前模式数据
+  if (APP.mode === 'user' && APP.currentUser) {
+    saveUserData();
+  } else if (APP.mode === 'guest') {
+    saveState();
+  }
+
+  // 切换前重新加载公开库,确保看到其他用户的最新公开数据
+  loadPublicRepl();
+
+  if (mode === 'admin') {
+    if (!confirm('Ĉu vi volas eniri administran reĝimon?')) return;
+    APP.adminEditing = false; APP.adminEditTarget = null;
+    // 管理模式沿用当前用户数据,无需重载
+  } else if (mode === 'user') {
+    const name = prompt('Enigu uzantnomon:');
+    if (!name) return;
+    APP.currentUser = name;
+    const userData = loadUserData(name);
+    if (userData) {
+      APP.replacements = userData.replacements;
+      APP.privateGlobalReplacements = userData.privateGlobalReplacements;
+      mergeGlobalReplacements();
+      showToast('Uzanto ' + name + ' ŝargita', 'success');
+    } else {
+      APP.replacements = {};
+      APP.privateGlobalReplacements = {};
+      mergeGlobalReplacements();
+      showToast('Nova uzanto: ' + name, 'success');
+    }
+  } else if (mode === 'guest') {
+    loadState();
+    APP.currentUser = null;
+  }
+  APP.mode = mode;
+  if (mode !== 'admin') { APP.adminEditing = false; APP.adminEditTarget = null; closeEditor(); }
+  saveState();
+  renderAll();
+  const modeNames = { guest:'Sensaluti', user:'Uzanto', admin:'Administranto' };
+  showToast('Reĝimo: ' + modeNames[mode], 'success');
+}
+
+// ============================================================
+// 13. 导入/导出 / 重置
+// ============================================================
+function exportData() {
+  const data = { version:'1.0', exportedAt:new Date().toISOString(), sentences:APP.sentences, replacements:APP.replacements };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'e-stacio-data.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Datumoj elportitaj', 'success');
+}
+
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.sentences && Array.isArray(data.sentences)) {
+        APP.sentences = data.sentences;
+        if (data.replacements) APP.replacements = data.replacements;
+        saveSentences(); saveState();
+        APP.currentIndex = 0; closeEditor(); renderAll();
+        showToast('Enporto sukcesa! ' + APP.sentences.length + ' frazoj', 'success');
+      } else { showToast('Nevalida formato', 'error'); }
+    } catch(err) { showToast('Eraro: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetData() {
+  if (!confirm('Ĉu vi certe volas restarigi ĉiujn datumojn?')) return;
+  APP.sentences = SENTENCES_RAW.map(s => ({ ...s, morfemoj: s.morfemoj.map(m => ({...m})) }));
+  APP.replacements = {}; APP.privateGlobalReplacements = {};
+  mergeGlobalReplacements();
+  APP.currentIndex = 0; APP.adminEditing = false; APP.adminEditTarget = null;
+  closeEditor();
+  saveSentences(); saveState();
+  renderAll();
+  showToast('Datumoj restarigitaj', 'success');
+}
+
+// ============================================================
+// 14. Toast
+// ============================================================
+let toastTimer = null;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  clearTimeout(toastTimer);
+  void el.offsetWidth;
+  el.classList.add('show');
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// 15. 初始化
+// ============================================================
+function init() {
+  if (!loadSentences()) {
+    APP.sentences = SENTENCES_RAW.map(s => ({ ...s, morfemoj: s.morfemoj.map(m => ({...m})) }));
+    saveSentences();
+  }
+  loadPublicRepl();  // 加载公开库(其他用户贡献的汉字映射)
+  loadState();
+  buildSentenceSelect();
+  if (APP.currentIndex >= APP.sentences.length) APP.currentIndex = 0;
+  document.getElementById('langSelect').value = APP.lang;
+
+  // 事件绑定
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+
+  });
+
+  // 抽屉切换
+  document.getElementById('drawerToggle').addEventListener('click', () => toggleDrawer());
+  document.getElementById('sidebarCloseBtn').addEventListener('click', () => toggleDrawer(true));
+  document.getElementById('drawerOverlay').addEventListener('click', () => toggleDrawer(true));
+
+  
+  document.getElementById('langSelect').addEventListener('change', (e) => {
+    APP.lang = e.target.value; saveState(); renderAll();
+  });
+  document.querySelectorAll('.toggle-group button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      APP.mergeMode = btn.dataset.merge === 'true';
+      saveState(); renderAll();
+      showToast(APP.mergeMode ? 'Reĝimo: Kuniga' : 'Reĝimo: Divida', 'success');
+    });
+  });
+  document.getElementById('speakBtn').addEventListener('click', speakCurrent);
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Restarigi ĉiujn anstataŭigojn por tiu ĉi frazo?')) {
+      const s = getCurrentSentence();
+      if (s) {
+        const expanded = expandiMorfemoj(s.morfemoj, APP.mergeMode);
+        expanded.forEach(item => {
+          setReplacement(s.id, item.origIdx, '', item.subIdx);
+        });
+        renderAll();
+        showToast('Frazo restarigita', 'success');
+      }
+    }
+  });
+  document.getElementById('sentenceJump').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { goToSentence(this.value); this.blur(); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', goToPrev);
+  document.getElementById('nextBtn').addEventListener('click', goToNext);
+  document.getElementById('editorSave').addEventListener('click', saveEditor);
+  document.getElementById('editorClear').addEventListener('click', clearEditor);
+  document.getElementById('editorClose').addEventListener('click', closeEditor);
+  document.getElementById('editorInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveEditor();
+    if (e.key === 'Escape') closeEditor();
+  });
+  document.getElementById('adminEditToggle').addEventListener('click', () => {
+    APP.adminEditing = !APP.adminEditing;
+    if (APP.adminEditing) showToast('Redakta reĝimo aktiva', 'success');
+    else { APP.adminEditTarget = null; showToast('Redakta reĝimo malaktiva', 'success'); }
+    renderAll();
+  });
+  document.getElementById('adminExport').addEventListener('click', exportData);
+  document.getElementById('adminImportBtn').addEventListener('click', () => document.getElementById('adminFileInput').click());
+  document.getElementById('adminFileInput').addEventListener('change', (e) => {
+    if (e.target.files.length > 0) { importData(e.target.files[0]); }
+    e.target.value = '';
+  });
+  document.getElementById('adminResetData').addEventListener('click', resetData);
+  document.getElementById('adminAddBtn').addEventListener('click', () => {
+    const d = document.getElementById('adminNewD').value.trim();
+    const b = document.getElementById('adminNewB').value.trim();
+    const n = parseInt(document.getElementById('adminNewN').value) || 0;
+    if (!d || !b) { showToast('Plenigu montrata kaj baza formoj', 'error'); return; }
+    const s = getCurrentSentence();
+    if (s) {
+      s.morfemoj.push({ d, b, n });
+      saveSentences();
+      renderAll();
+      document.getElementById('adminNewD').value = '';
+      document.getElementById('adminNewB').value = '';
+      document.getElementById('adminNewN').value = '0';
+      showToast('Morfemo aldonita', 'success');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft') goToPrev();
+    if (e.key === 'ArrowRight') goToNext();
+    if (e.key === ' ' && !e.repeat) { e.preventDefault(); speakCurrent(); }
+  });
+
+  updateGlossary();
+  renderAll();
+  showToast('Bonvenon al E-stacio · 世语译站', 'success');
+  setTimeout(() => {
+    const s = getCurrentSentence();
+    if (s && Object.keys(APP.replacements).length === 0) {
+      showToast('Alklaku morfemon por enigi anstataŭigon', 'success');
+    }
+  }, 800);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+function copySentence(mode) {
+  const s = getCurrentSentence();
+  if (!s) return;
+  const expanded = expandiMorfemoj(s.morfemoj, APP.mergeMode);
+  const parts = expanded.map(item => {
+    const repl = getReplacement(s.id, item.origIdx, item.subIdx);
+    if (repl && repl.trim()) {
+      return mode === 'A' ? repl : repl + '(' + item.b + ')';
+    }
+    return item.d;
+  });
+  const text = parts.join('');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(mode === 'A' ? '格式A已复制' : '格式B已复制', 'success');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+    showToast(mode === 'A' ? '格式A已复制' : '格式B已复制', 'success');
+  });
+}
+  document.getElementById('copyBtnA').addEventListener('click', () => copySentence('A'));
+  document.getElementById('copyBtnB').addEventListener('click', () => copySentence('B'));
+</script>
+
+</html>

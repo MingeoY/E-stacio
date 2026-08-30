@@ -116,6 +116,7 @@
     .editor-panel .suggestions { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
     .editor-panel .suggestions .sug-label { font-size:0.75rem; color:var(--text-light); margin-right:4px; }
     .editor-panel .suggestions .sug-tag { background:var(--bg); padding:2px 12px; border-radius:20px; font-size:0.8rem; cursor:pointer; border:1px solid var(--border); color:var(--text); transition:var(--transition); }
+    .editor-panel .suggestions .sug-tag.sug-live { border-color:var(--accent); color:var(--accent); font-weight:600; }
     .editor-panel .suggestions .sug-tag:hover { background:var(--primary-light); color:#fff; border-color:var(--primary-light); }
     .editor-other-examples { margin-top:12px; padding-top:10px; border-top:1px dashed var(--border); font-size:0.8rem; color:var(--text-light); max-height:150px; overflow-y:auto; }
     .editor-other-examples .example-item { padding:3px 0; display:flex; gap:8px; align-items:baseline; }
@@ -258,12 +259,41 @@
     .glossary-popup .popup-sent .sid { font-weight:500; color:var(--primary); margin-right:6px; }
     .glossary-popup .popup-sent .stext { color:var(--text); }
     .glossary-popup .popup-sent .strans { font-size:0.75rem; color:var(--text-light); margin-top:2px; }
-
+    /* ===== 社区贡献页 ===== */
+    .contrib-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; justify-content:center; align-items:center; padding:24px 16px; }
+    .contrib-overlay.open { display:flex; }
+    .contrib-page { background:var(--card); border-radius:12px; max-width:640px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.3); }
+    .contrib-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
+    .contrib-header h3 { margin:0; font-size:1.05rem; }
+    .contrib-stats { padding:8px 18px; font-size:0.8rem; color:var(--text-light); border-bottom:1px dashed var(--border); }
+    .contrib-list { overflow-y:auto; padding:10px 18px 18px; }
+    .contrib-empty { color:var(--text-light); font-size:0.85rem; padding:18px 0; text-align:center; }
+    .contrib-group { margin-bottom:14px; }
+    .contrib-key { font-family:monospace; font-size:0.78rem; color:var(--primary); font-weight:600; padding:4px 0; border-bottom:1px solid var(--border); }
+    .contrib-row { display:flex; align-items:baseline; gap:10px; padding:6px 2px; border-bottom:1px dashed var(--border); font-size:0.9rem; }
+    .contrib-row:last-child { border-bottom:none; }
+    .contrib-row.effective .contrib-hanzi { color:var(--accent); }
+    .contrib-hanzi { font-size:1.15rem; font-weight:700; min-width:32px; }
+    .contrib-meta { color:var(--text-light); font-size:0.78rem; flex:1; }
+    .contrib-badge { font-size:0.68rem; background:var(--accent); color:#fff; border-radius:10px; padding:1px 8px; }
+    .glossary-sort-btn { font-size:0.72rem; padding:2px 10px; border-radius:10px; border:1px solid var(--border); background:var(--card); cursor:pointer; margin-left:6px; vertical-align:middle; }
+    .glossary-sort-btn:hover { border-color:var(--primary); color:var(--primary); }
   </style>
 </head>
 
 <div class="glossary-popup-overlay" id="popupOverlay" onclick="closeGlossaryPopup()"></div>
 <div class="glossary-popup" id="glossaryPopup"></div>
+<!-- ===== 社区贡献页 ===== -->
+<div class="contrib-overlay" id="contribOverlay">
+  <div class="contrib-page">
+    <div class="contrib-header">
+      <h3 data-i18n="contrib_title">Kontribuoj de la komunumo</h3>
+      <button class="sidebar-close" id="contribCloseBtn" title="Fermi">&times;</button>
+    </div>
+    <div class="contrib-stats" id="contribStats"></div>
+    <div class="contrib-list" id="contribList"></div>
+  </div>
+</div>
 
 <body>
 
@@ -281,10 +311,10 @@
     </div>
     <!-- ===== 词汇表（移入抽屉） ===== -->
     <div class="glossary-grid-wrap" id="glossaryGridWrap">
-      <h3>Vortprovizo</h3>
-      <div class="glossary-section-label">n=0 — Fundamentaj finaĵoj</div>
+      <h3>Vortprovizo <button id="glossarySortBtn" class="glossary-sort-btn" title="Ordigo: laŭ b-alfabeta / laŭ hanzi-strokoj（按b字母序 / 按汉字笔画序）">↕ b</button></h3>
+      <div class="glossary-section-label" data-i18n="glossary_n0">n=0 — Fundamentaj finaĵoj</div>
       <div class="glossary-grid" id="glossaryGridN0"></div>
-      <div class="glossary-section-label">n>0 — Ordinaraj morfemoj</div>
+      <div class="glossary-section-label" data-i18n="glossary_npos">n>0 — Ordinaraj morfemoj</div>
       <div class="glossary-grid" id="glossaryGridNpos"></div>
     </div>
   </aside>
@@ -310,6 +340,7 @@
     <!-- ===== 设置栏 ===== -->
     <div class="settings">
       <button class="btn-icon secondary" id="drawerToggle" title="Frazoj / Vortprovizo">☰ <span data-i18n="panel_title">Panelo</span></button>
+      <button class="btn-icon secondary" id="contribBtn" title="Kontribuoj de la komunumo">👥 <span data-i18n="contrib_btn">Kontribuoj</span></button>
       <label>
         <span data-i18n="label_lang">Lingvo</span>
         <select id="langSelect">
@@ -429,13 +460,15 @@ const APP = {
   sentences: [],
   currentIndex: 0,
   lang: 'zh',
+  glossarySort: 'alpha',   // 'alpha' = 按b字母序, 'stroke' = 汉字笔画序(有汉字者优先)
   mergeMode: false,        // false = Divida, true = Kuniga
   mode: 'guest',
   replacements: {},          // 逐位置覆盖(每句每位置),用于句子重置
   selectedSentences: null,  // null = all selected
   globalReplacements: {},    // 当前用户有效汉字映射库(公开库 + 私有覆盖,合并后只读)
   privateGlobalReplacements: {}, // 当前用户私有汉字映射库(覆盖公开库)
-  publicRepl: {},            // 公开库缓存(从 localStorage 读取,只读)
+  publicRepl: {},            // 有效公开映射(由贡献库投票计算)
+  publicContrib: {},         // 社区贡献库 { "b|n": { 汉字: { c:票数, u:{用户:时间戳} } } }
   adminEditing: false,
   adminEditTarget: null,
   editorOpen: false,
@@ -502,17 +535,7 @@ function getReplacement(sId, origIdx, subIdx) {
   if (s) {
     const m = s.morfemoj[origIdx];
     if (m) {
-      let globalKey;
-      if (m.n === 0) {
-        if (subIdx !== undefined && subIdx !== null && m.d.length > 1) {
-          const splitChar = m.d.split('')[subIdx] || m.d;
-          globalKey = splitChar.toLowerCase() + '|0';
-        } else {
-          globalKey = m.d.toLowerCase() + '|0';
-        }
-      } else {
-        globalKey = m.b + '|' + m.n;
-      }
+      const globalKey = computeGlobalKey(m, subIdx);
       const globalVal = APP.globalReplacements[globalKey];
       if (globalVal !== undefined) return globalVal;
     }
@@ -520,33 +543,40 @@ function getReplacement(sId, origIdx, subIdx) {
   return '';
 }
 
+// 计算词素的全局/社区贡献键:一律以 b 字段为准(n 辅助区分),d 仅用于例句展示
+// 合并模式:n=0 词尾按整体替换(如 ojn|0;单字符词尾为 o|0)
+// 拆分模式:一切 n=0 词素(拆分字符与单字符词尾)使用独立字符命名空间 char|-1,
+//          与合并模式互不影响;拆分字符间仍统一映射(所有 n 共用一个键)
+function computeGlobalKey(m, subIdx) {
+  if (m.n === 0) {
+    if (APP.mergeMode) {
+      return m.b.toLowerCase() + '|0';
+    }
+    if (m.b.length > 1 && subIdx !== undefined && subIdx !== null) {
+      return m.b.split('')[subIdx].toLowerCase() + '|-1';
+    }
+    return m.b.toLowerCase() + '|-1';
+  }
+  return m.b + '|' + m.n;
+}
+
 // 同步全局替换: 将替换同步到所有相同词元(b 相同且 n 相同)
-// 同时更新当前用户私有映射库;登录/管理模式下写入公开库向其他用户公开
+// 同时更新当前用户私有映射库;登录/管理模式下记录为社区贡献向其他用户公开
 function syncGlobalReplacement(sId, origIdx, val, subIdx) {
   const s = APP.sentences.find(s => s.id === sId);
   if (!s) return;
   const m = s.morfemoj[origIdx];
   if (!m) return;
-  let globalKey;
-  if (m.n === 0) {
-    if (subIdx !== undefined && subIdx !== null && m.d.length > 1) {
-      const splitChar = m.d.split('')[subIdx] || m.d;
-      globalKey = splitChar.toLowerCase() + '|0';
-    } else {
-      globalKey = m.d.toLowerCase() + '|0';
-    }
-  } else {
-    globalKey = m.b + '|' + m.n;
-  }
+  const globalKey = computeGlobalKey(m, subIdx);
   // 写入当前用户私有映射库
   if (val && val.trim()) {
     APP.privateGlobalReplacements[globalKey] = val.trim();
   } else {
     delete APP.privateGlobalReplacements[globalKey];
   }
-  // 登录/管理模式下,写入公开库向其他用户公开
+  // 登录/管理模式下,记录为社区贡献(投票制)向其他用户公开
   if (APP.mode === 'user' || APP.mode === 'admin') {
-    savePublicRepl(globalKey, val && val.trim() ? val.trim() : null);
+    recordContribution(globalKey, val && val.trim() ? val.trim() : null, APP.currentUser || 'admin');
   }
   // 重新合并生成有效映射库
   mergeGlobalReplacements();
@@ -583,19 +613,71 @@ const STATE_KEY = 'e-stacio-state';
 const SENTENCE_KEY = 'e-stacio-sentences';
 const PUBLIC_KEY = 'e-stacio-public';
 
-// 加载公开库(所有用户共享,由登录/管理模式的用户贡献)
+// 加载社区贡献库(所有登录/管理用户共享)
+// v2 结构: { v:2, contrib: { "b|n": { 汉字: { c:票数, u: { 用户名: 时间戳 } } } } }
+// 兼容 v1 平铺结构 { "b|n": 汉字 } → 自动迁移为单票记录
 function loadPublicRepl() {
+  APP.publicContrib = {};
   try {
     const raw = localStorage.getItem(PUBLIC_KEY);
-    APP.publicRepl = raw ? JSON.parse(raw) : {};
-  } catch (_) { APP.publicRepl = {}; }
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.v === 2 && data.contrib) {
+        APP.publicContrib = normalizeContribKeys(data.contrib);  // 归一化历史 d 基键
+        persistPublicContrib();
+      } else if (data && typeof data === 'object') {
+        Object.entries(data).forEach(([k, h]) => {
+          if (typeof h === 'string' && h) APP.publicContrib[k] = { [h]: { c: 1, u: {} } };
+        });
+        APP.publicContrib = normalizeContribKeys(APP.publicContrib);
+        persistPublicContrib();
+      }
+    }
+  } catch (_) { APP.publicContrib = {}; }
+  computeEffectivePublic();
 }
 
-// 写入单条公开库记录(val 为 null 表示删除)
-function savePublicRepl(key, val) {
-  if (val) APP.publicRepl[key] = val;
-  else delete APP.publicRepl[key];
-  try { localStorage.setItem(PUBLIC_KEY, JSON.stringify(APP.publicRepl)); } catch (_) {}
+function persistPublicContrib() {
+  try { localStorage.setItem(PUBLIC_KEY, JSON.stringify({ v: 2, contrib: APP.publicContrib })); } catch (_) {}
+}
+
+// 记录/撤销一个用户对 (key, 汉字) 的贡献(hanzi 为 null 表示撤销该用户对此 key 的投票)
+function recordContribution(key, hanzi, username) {
+  if (!key || !username) return;
+  const slot = (APP.publicContrib[key] = APP.publicContrib[key] || {});
+  if (hanzi) {
+    const entry = (slot[hanzi] = slot[hanzi] || { c: 0, u: {} });
+    entry.u[username] = Date.now();
+    entry.c = Object.keys(entry.u).length;
+  } else {
+    Object.keys(slot).forEach(h => {
+      if (slot[h].u && slot[h].u[username]) {
+        delete slot[h].u[username];
+        slot[h].c = Object.keys(slot[h].u).length;
+        if (slot[h].c === 0) delete slot[h];
+      }
+    });
+    if (Object.keys(slot).length === 0) delete APP.publicContrib[key];
+  }
+  persistPublicContrib();
+  computeEffectivePublic();
+}
+
+// 由贡献库计算有效公开映射:每 key 取票数最高的汉字(同票取最近贡献)
+function computeEffectivePublic() {
+  const eff = {};
+  Object.entries(APP.publicContrib).forEach(([key, hanziMap]) => {
+    let best = null, bestC = -1, bestT = -1;
+    Object.entries(hanziMap).forEach(([h, info]) => {
+      const times = Object.values(info.u || {});
+      const latest = times.length ? Math.max(...times) : 0;
+      if (info.c > bestC || (info.c === bestC && latest > bestT)) {
+        best = h; bestC = info.c; bestT = latest;
+      }
+    });
+    if (best) eff[key] = best;
+  });
+  APP.publicRepl = eff;
 }
 
 function saveState() {
@@ -604,6 +686,7 @@ function saveState() {
       replacements: APP.replacements,
       privateGlobalReplacements: APP.privateGlobalReplacements,
       lang: APP.lang,
+      glossarySort: APP.glossarySort,
       mergeMode: APP.mergeMode,
       mode: APP.mode,
       currentIndex: APP.currentIndex,
@@ -613,21 +696,52 @@ function saveState() {
   } catch (_) {}
 }
 
+// 旧数据迁移:早期版本 n=0 键误用 d 字段(可能含标点,如 'ojn.|0'),归一化为 b 字段
+function cleanReplKey(k) {
+  const i = k.lastIndexOf('|');
+  if (i < 0) return k;
+  return k.slice(0, i).replace(/[^a-zĉĝĥĵŝŭ]/g, '') + k.slice(i);
+}
+
+function normalizeKeyedObj(obj) {
+  const out = {};
+  Object.entries(obj || {}).forEach(([k, v]) => {
+    const ck = cleanReplKey(k);
+    if (out[ck] === undefined) out[ck] = v;
+  });
+  return out;
+}
+
+function normalizeContribKeys(contrib) {
+  const out = {};
+  Object.entries(contrib || {}).forEach(([k, hanziMap]) => {
+    const ck = cleanReplKey(k);
+    const slot = (out[ck] = out[ck] || {});
+    Object.entries(hanziMap).forEach(([h, info]) => {
+      const entry = (slot[h] = slot[h] || { c: 0, u: {} });
+      Object.assign(entry.u, info.u || {});
+      entry.c = Object.keys(entry.u).length;
+    });
+  });
+  return out;
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STATE_KEY);
     if (!raw) return;
     const data = JSON.parse(raw);
     APP.replacements = data.replacements || {};
-    // 兼容旧数据:旧的 globalReplacements 迁移为 private
+    // 兼容旧数据:旧的 globalReplacements 迁移为 private,并归一化历史 d 基键
     if (data.privateGlobalReplacements) {
-      APP.privateGlobalReplacements = data.privateGlobalReplacements;
+      APP.privateGlobalReplacements = normalizeKeyedObj(data.privateGlobalReplacements);
     } else if (data.globalReplacements) {
-      APP.privateGlobalReplacements = data.globalReplacements;
+      APP.privateGlobalReplacements = normalizeKeyedObj(data.globalReplacements);
     } else {
       APP.privateGlobalReplacements = {};
     }
     APP.lang = data.lang || 'zh';
+    APP.glossarySort = data.glossarySort === 'stroke' ? 'stroke' : 'alpha';
     APP.mergeMode = data.mergeMode || false;
     APP.mode = data.mode || 'guest';
     APP.currentIndex = data.currentIndex || 0;
@@ -653,8 +767,8 @@ function loadUserData(username) {
     const raw = localStorage.getItem(userKey);
     if (raw) {
       const data = JSON.parse(raw);
-      // 兼容旧数据:旧的 globalReplacements 迁移为 private
-      const priv = data.privateGlobalReplacements || data.globalReplacements || {};
+      // 兼容旧数据:旧的 globalReplacements 迁移为 private,并归一化历史 d 基键
+      const priv = normalizeKeyedObj(data.privateGlobalReplacements || data.globalReplacements || {});
       return { replacements: data.replacements || {}, privateGlobalReplacements: priv };
     }
   } catch (_) {}
@@ -708,6 +822,93 @@ function getSelectedIds() {
   return ids.length === sel.options.length ? null : ids;
 }
 
+// 词汇表排序:alpha = 按 b 字母序、同 b 按 n;stroke = 有汉字化者按汉字排序(Unihan 部首笔画序)在前,
+// 无汉字化或排序相同(含相同汉字)者回退原有机制;n=0 与 n>0 两组始终分开排序
+var _strokeCollator = null;
+try { _strokeCollator = new Intl.Collator('zh-Hant-u-co-unihan'); } catch (_) {}
+function firstHanziChar(s) {
+  if (!s) return '';
+  var m = s.match(/[\u3400-\u9fff\uf900-\ufaff]/);
+  return m ? m[0] : s.charAt(0);
+}
+function compareGlossary(a, b) {
+  if (APP.glossarySort === 'stroke') {
+    var ra = getGlobalRepl(a.b, a.n), rb = getGlobalRepl(b.b, b.n);
+    if (ra && rb) {
+      var ca = firstHanziChar(ra), cb = firstHanziChar(rb);
+      var cmp = _strokeCollator
+        ? _strokeCollator.compare(ca, cb)
+        : (ca.codePointAt(0) || 0) - (cb.codePointAt(0) || 0);
+      if (cmp !== 0) return cmp;
+    } else if (ra) return -1;
+    else if (rb) return 1;
+  }
+  return a.b.localeCompare(b.b) || a.n - b.n;
+}
+
+// ===== 社区贡献页:直接查看其他玩家的全部贡献 =====
+function openContribPage() {
+  loadPublicRepl();          // 重新读取,获取其他用户的最新公开贡献
+  mergeGlobalReplacements();
+  renderContribPage();
+  document.getElementById('contribOverlay').classList.add('open');
+  updateGlossary();          // 公开库若有变化,词汇表同步刷新
+}
+
+function closeContribPage() {
+  document.getElementById('contribOverlay').classList.remove('open');
+}
+
+function renderContribPage() {
+  var list = document.getElementById('contribList');
+  var stats = document.getElementById('contribStats');
+  if (!list || !stats) return;
+  var contrib = APP.publicContrib || {};
+  var keys = Object.keys(contrib).sort();
+  var totalVotes = 0, users = {};
+  keys.forEach(function(k) {
+    Object.values(contrib[k]).forEach(function(info) {
+      totalVotes += info.c;
+      Object.keys(info.u || {}).forEach(function(u) { users[u] = true; });
+    });
+  });
+  stats.textContent = keys.length + ' ŝlosiloj · ' + totalVotes + ' voĉoj · ' + Object.keys(users).length + ' uzantoj';
+  list.innerHTML = '';
+  if (!keys.length) {
+    var empty = document.createElement('div');
+    empty.className = 'contrib-empty';
+    empty.setAttribute('data-i18n', 'contrib_empty');
+    empty.textContent = 'Neniu kontribuo ankoraŭ.';
+    list.appendChild(empty);
+    updateI18n();
+    return;
+  }
+  keys.forEach(function(k) {
+    var candidates = Object.entries(contrib[k]).sort(function(a, b) {
+      return b[1].c - a[1].c || a[0].localeCompare(b[0]);
+    });
+    var group = document.createElement('div');
+    group.className = 'contrib-group';
+    var head = document.createElement('div');
+    head.className = 'contrib-key';
+    head.textContent = k;
+    group.appendChild(head);
+    candidates.forEach(function(pair) {
+      var h = pair[0], info = pair[1];
+      var us = Object.keys(info.u || {});
+      var isEff = APP.publicRepl[k] === h;   // 当前公开有效值
+      var row = document.createElement('div');
+      row.className = 'contrib-row' + (isEff ? ' effective' : '');
+      row.innerHTML = '<span class="contrib-hanzi">' + h + '</span>' +
+        '<span class="contrib-meta">×' + info.c + (us.length ? ' · ' + us.join(', ') : '') + '</span>' +
+        (isEff ? '<span class="contrib-badge" data-i18n="contrib_effective">efektiva</span>' : '');
+      group.appendChild(row);
+    });
+    list.appendChild(group);
+  });
+  updateI18n();
+}
+
 function updateGlossary() {
   var selected = getSelectedIds();
   var map = {};
@@ -716,14 +917,24 @@ function updateGlossary() {
     if (typeof id === 'object') { s = id; } else { s = APP.sentences.find(function(x) { return x.id === id; }); }
     if (!s) return;
     s.morfemoj.forEach(function(m) {
+      if (!APP.mergeMode && m.n === 0) {
+        // 拆分模式:n=0 部分按拆分字符展示(char|-1 命名空间),与合并模式的整体词尾互不影响
+        (m.b.length > 1 ? m.b.split('') : [m.b]).forEach(function(ch) {
+          ch = ch.toLowerCase();
+          var ck = ch + '|-1';
+          if (!map[ck]) { map[ck] = { b: ch, n: -1, sample: ch, sentIds: [] }; }
+          if (map[ck].sentIds.indexOf(s.id) === -1) map[ck].sentIds.push(s.id);
+        });
+        return;
+      }
       var key = m.b + '|' + m.n;
       if (!map[key]) { map[key] = { b: m.b, n: m.n, sample: m.d, sentIds: [] }; }
       map[key].sentIds.push(s.id);
     });
   });
   var entries = Object.values(map);
-  entries.sort(function(a,b) { return a.b.localeCompare(b.b) || a.n - b.n; });
-  var n0 = entries.filter(function(e) { return e.n === 0; });
+  entries.sort(compareGlossary);
+  var n0 = entries.filter(function(e) { return e.n <= 0; });
   var nP = entries.filter(function(e) { return e.n > 0; });
   renderGlossaryGrid('glossaryGridN0', n0, false);
   renderGlossaryGrid('glossaryGridNpos', nP, true);
@@ -797,7 +1008,9 @@ function renderAll() {
 function updateI18n() {
   const lang = APP.lang;
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
+    let key = el.dataset.i18n;
+    // 拆分模式下词汇表 n=0 区按字符(n=-1)展示,标题相应切换
+    if (key === 'glossary_n0' && !APP.mergeMode) key = 'glossary_n0_split';
     const msg = I18N[key];
     if (msg) {
       const eo = msg.eo || msg.zh;
@@ -978,24 +1191,36 @@ function renderEditor() {
       if (m) {
         const subIdx = APP.editorTarget.subIndex;
         const display = subIdx !== undefined ? m.d[subIdx] : m.d;
-        const refText = display + ' (n=' + m.n + (subIdx !== undefined ? '·' + subIdx : '') + ')';
+        // 拆分模式下 n=0 词素统一使用字符命名空间(n=-1),标题与实际替换键一致
+        const displayN = (!APP.mergeMode && m.n === 0) ? -1 : m.n;
+        const refText = display + ' (n=' + displayN + (subIdx !== undefined ? '·' + subIdx : '') + ')';
         document.getElementById('editorRef').textContent = refText;
         const currentRepl = getReplacement(s.id, APP.editorTarget.morfemoIndex, subIdx);
         document.getElementById('editorInput').value = currentRepl;
         document.getElementById('editorInput').focus();
 
-        // 社区建议
+        // 社区建议:实时贡献(精确 b|n 键)优先,静态种子 COMMUNITY_DATA 补充
         const wrap = document.getElementById('suggestionsWrap');
         wrap.innerHTML = '<span class="sug-label" data-i18n="suggest_label">Elekto de aliaj:</span>';
-        const base = m.b;
-        const suggestions = COMMUNITY_DATA[base] || {};
-        const entries = Object.entries(suggestions).sort((a,b) => b[1] - a[1]);
-        if (entries.length > 0) {
-          entries.slice(0,4).forEach(([char, count]) => {
+        const gkey = computeGlobalKey(m, subIdx);
+        const live = APP.publicContrib[gkey] || {};
+        const seed = COMMUNITY_DATA[m.b] || {};
+        const seenChars = new Set();
+        const items = [];
+        Object.entries(live).sort((a, b) => b[1].c - a[1].c).forEach(([char, info]) => {
+          seenChars.add(char);
+          items.push({ char, count: info.c, live: true, users: Object.keys(info.u || {}) });
+        });
+        Object.entries(seed).sort((a, b) => b[1] - a[1]).forEach(([char, count]) => {
+          if (!seenChars.has(char)) items.push({ char, count, live: false });
+        });
+        if (items.length > 0) {
+          items.slice(0, 6).forEach(it => {
             const tag = document.createElement('span');
-            tag.className = 'sug-tag';
-            tag.textContent = char + ' (' + count + ')';
-            tag.addEventListener('click', () => { document.getElementById('editorInput').value = char; });
+            tag.className = 'sug-tag' + (it.live ? ' sug-live' : '');
+            tag.textContent = it.char + (it.live ? ' ×' + it.count : ' (' + it.count + ')');
+            if (it.live && it.users.length) tag.title = it.users.join(', ');
+            tag.addEventListener('click', () => { document.getElementById('editorInput').value = it.char; });
             wrap.appendChild(tag);
           });
         } else {
@@ -1010,7 +1235,7 @@ function renderEditor() {
         if (subIdx === undefined || (m.n === 0 && subIdx !== undefined && subIdx !== null)) {
           otherDiv.style.display = 'block';
           const list = document.getElementById('exampleList');
-          const splitCh = (subIdx !== undefined && subIdx !== null && m.n === 0 && m.d.length > 1) ? m.d.split('')[subIdx].toLowerCase() : null;
+          const splitCh = (subIdx !== undefined && subIdx !== null && m.n === 0 && m.b.length > 1) ? m.b.split('')[subIdx].toLowerCase() : null;
           list.innerHTML = '';
           APP.sentences.forEach(other => {
             other.morfemoj.forEach((om, oi) => {
@@ -1153,7 +1378,9 @@ function speakCurrent() {
 
 function getGlobalRepl(b, n) {
   if (n > 0) return APP.globalReplacements[b + '|' + n] || '';
-  return APP.globalReplacements[b.toLowerCase() + '|0'] || '';
+  // n=-1 为拆分模式字符键;拆分模式下 n=0 条目同样按字符键读取
+  var key = (n === -1 || !APP.mergeMode) ? b.toLowerCase() + '|-1' : b.toLowerCase() + '|0';
+  return APP.globalReplacements[key] || '';
 }
 
 // ============================================================
@@ -1219,7 +1446,7 @@ function setMode(mode) {
 // 13. 导入/导出 / 重置
 // ============================================================
 function exportData() {
-  const data = { version:'1.0', exportedAt:new Date().toISOString(), sentences:APP.sentences, replacements:APP.replacements };
+  const data = { version:'1.1', exportedAt:new Date().toISOString(), sentences:APP.sentences, replacements:APP.replacements, publicContrib:APP.publicContrib };
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'e-stacio-data.json'; a.click();
@@ -1235,6 +1462,19 @@ function importData(file) {
       if (data.sentences && Array.isArray(data.sentences)) {
         APP.sentences = data.sentences;
         if (data.replacements) APP.replacements = data.replacements;
+        // 合并社区贡献数据(按用户名去重,保留最新时间戳)
+        if (data.publicContrib && typeof data.publicContrib === 'object') {
+          Object.entries(data.publicContrib).forEach(([k, hanziMap]) => {
+            const slot = (APP.publicContrib[k] = APP.publicContrib[k] || {});
+            Object.entries(hanziMap).forEach(([h, info]) => {
+              const entry = (slot[h] = slot[h] || { c: 0, u: {} });
+              Object.assign(entry.u, info.u || {});
+              entry.c = Object.keys(entry.u).length;
+            });
+          });
+          persistPublicContrib();
+          computeEffectivePublic();
+        }
         saveSentences(); saveState();
         APP.currentIndex = 0; closeEditor(); renderAll();
         showToast('Enporto sukcesa! ' + APP.sentences.length + ' frazoj', 'success');
@@ -1295,7 +1535,24 @@ function init() {
   document.getElementById('sidebarCloseBtn').addEventListener('click', () => toggleDrawer(true));
   document.getElementById('drawerOverlay').addEventListener('click', () => toggleDrawer(true));
 
-  
+  // 社区贡献页
+  document.getElementById('contribBtn').addEventListener('click', openContribPage);
+  document.getElementById('contribCloseBtn').addEventListener('click', closeContribPage);
+
+  // 词汇表排序切换
+  var sortBtn = document.getElementById('glossarySortBtn');
+  var updateSortBtn = function() { sortBtn.textContent = APP.glossarySort === 'alpha' ? '↕ b' : '↕ 汉'; };
+  updateSortBtn();
+  sortBtn.addEventListener('click', function() {
+    APP.glossarySort = APP.glossarySort === 'alpha' ? 'stroke' : 'alpha';
+    updateSortBtn();
+    saveState();
+    updateGlossary();
+    var msg = I18N[APP.glossarySort === 'alpha' ? 'glossary_sort_b' : 'glossary_sort_strokes'];
+    showToast(msg ? (msg[APP.lang] || msg.eo) : 'Ordigo ŝanĝita', 'success');
+  });
+
+
   document.getElementById('langSelect').addEventListener('change', (e) => {
     APP.lang = e.target.value; saveState(); renderAll();
   });

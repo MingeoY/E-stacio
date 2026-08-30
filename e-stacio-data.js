@@ -38,10 +38,15 @@ const I18N = {
   glossary_title: { eo:'Vortprovizo', zh:'词汇表', ja:'語彙表', en:'Glossary' },
   glossary_sort_b: { eo:'Baza ordo', zh:'字母排序', ja:'アルファベット順', en:'Alphabetical' },
   glossary_sort_strokes: { eo:'Signa ordo', zh:'汉字笔画', ja:'画数順', en:'Stroke order' },
-  glossary_n0: { eo:'n=0 — Fundamentaj finaĵoj', zh:'基础词尾', ja:'基本語尾', en:'Basic endings' },
+  glossary_n0: { eo:'n=0 — Fundamentaj finaĵoj', zh:'特殊词尾（合并）', ja:'基本語尾', en:'Basic endings' },
+  glossary_n0_split: { eo:'n=-1 — Fundamentaj karakteroj', zh:'特殊词尾（拆分）', ja:'基本文字', en:'Basic characters' },
   glossary_npos: { eo:'n>0 — Ordinaraj morfemoj', zh:'普通词素', ja:'通常形態素', en:'Regular morphemes' },
   panel_title: { eo:'Panelo', zh:'面板', ja:'パネル', en:'Panel' },
   glossary_section_frazoj: { eo:'Frazoj', zh:'例句', ja:'例文', en:'Sentences' },
+  contrib_btn: { eo:'Kontribuoj', zh:'社区贡献', ja:'貢献', en:'Contributions' },
+  contrib_title: { eo:'Kontribuoj de la komunumo', zh:'社区贡献一览', ja:'コミュニティの貢献一覧', en:'Community contributions' },
+  contrib_empty: { eo:'Neniu kontribuo ankoraŭ — ensalutu kaj elektu hanzi-on por kontribui!', zh:'暂无社区贡献——登录并选用汉字即可贡献!', ja:'まだ貢献がありません——ログインして漢字を選ぶと貢献できます!', en:'No contributions yet — sign in and pick hanzi to contribute!' },
+  contrib_effective: { eo:'efektiva', zh:'生效中', ja:'有効', en:'effective' },
 };
 
 let currentLang = 'zh';

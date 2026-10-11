@@ -1790,14 +1790,16 @@ function importSentencesFile(file) {
   reader.readAsText(file);
 }
 
-// 导入社区贡献包:只合并 publicContrib,不动例句与私有替换
+// 导入社区贡献包:仅合并贡献数据(基线 contrib / 旧备份 publicContrib),不动例句与私有替换
 function importContribFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      if (data.publicContrib && typeof data.publicContrib === 'object') {
-        const added = mergeContribIntoLocal(normalizeContribKeys(data.publicContrib));
+      // 兼容两种来源:基线文件 community-data.json 用 contrib 字段,旧全量备份用 publicContrib
+      const raw = data.publicContrib || data.contrib;
+      if (raw && typeof raw === 'object') {
+        const added = mergeContribIntoLocal(normalizeContribKeys(raw));
         mergeGlobalReplacements();
         renderAll();
         renderContribPage();  // 贡献页当前已打开,刷新列表

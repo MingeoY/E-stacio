@@ -2,7 +2,7 @@
 // 1. 多语言包
 // ============================================================
 const I18N = {
-  subtitle: { eo:'⭐', zh:'世语译站', ja:'世語訳駅', en:'Esperanto Station' },
+  subtitle: { eo:'⭐', zh:'世语驿站', ja:'世語駅', en:'Esperanto Station' },
   mode_guest: { eo:'🛸 Sensaluti', zh:'游客', ja:'ゲスト', en:'Guest' },
   mode_user: { eo:'👤 Ensaluti', zh:'登录', ja:'ログイン', en:'Login' },
   mode_admin: { eo:'⚙ Administri', zh:'管理', ja:'管理', en:'Admin' },
@@ -47,16 +47,18 @@ const I18N = {
   contrib_title: { eo:'Kontribuoj de la komunumo', zh:'社区贡献一览', ja:'コミュニティの貢献一覧', en:'Community contributions' },
   contrib_empty: { eo:'Neniu kontribuo ankoraŭ — ensalutu kaj elektu hanzi-on por kontribui!', zh:'暂无社区贡献——登录并选用汉字即可贡献!', ja:'まだ貢献がありません——ログインして漢字を選ぶと貢献できます!', en:'No contributions yet — sign in and pick hanzi to contribute!' },
   contrib_effective: { eo:'efektiva', zh:'生效中', ja:'有効', en:'effective' },
+  contrib_import: { eo:'Importi pakon', zh:'导入贡献包', ja:'貢献を取り込む', en:'Import package' },
+  contrib_export: { eo:'Elporti bazlinion', zh:'导出基线', ja:'基線を書き出す', en:'Export baseline' },
 };
 
 let currentLang = 'zh';
 
 // ============================================================
-// 2. 句子数据 (合并版: 0-34 + 35-86 + 87-364)
+// 2. 句子数据
 // ============================================================
 
 const SENTENCES_RAW = [
-    // ---------- 0-34: 6月21日版 ----------
+    // Use basic words
     { id:0, skill:'Use basic words', translations:{zh:'我是索菲亚。',ja:'私はソフィアです。',en:'I am Sofia.'},
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' Sofi',b:'sofi',n:1},{d:'a.',b:'a',n:0}] },
     { id:1, skill:'Use basic words', translations:{zh:'你好，我是亚当。',ja:'こんにちは、私はアダムです。',en:'Hello, I am Adam.'},
@@ -66,6 +68,7 @@ const SENTENCES_RAW = [
     { id:3, skill:'Use basic words', translations:{zh:'亚当和索菲亚住在伦敦。',ja:'アダムとソフィアはロンドンに住んでいます。',en:'Adam and Sofia live in London.'},
       morfemoj:[{d:'Adam',b:'adam',n:1},{d:'o',b:'o',n:0},{d:' kaj',b:'kaj',n:1},{d:' Sofi',b:'sofi',n:1},{d:'a',b:'a',n:0},{d:' loĝ',b:'loĝ',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' London',b:'london',n:1},{d:'o.',b:'o',n:0}] },
     // -----Score: 6
+    // Introduce yourself
     { id:4, skill:'Introduce yourself', translations:{zh:'早上好，亚当！',ja:'おはよう、アダム！',en:'Good morning, Adam!'},
       morfemoj:[{d:'Bon',b:'bon',n:1},{d:'an',b:'an',n:0},{d:' maten',b:'maten',n:1},{d:'on,',b:'on',n:0},{d:' Adam',b:'adam',n:1},{d:'o!',b:'o',n:0}] },
     { id:5, skill:'Introduce yourself', translations:{zh:'你好，你怎么样？',ja:'こんにちは、お元気ですか？',en:'Hello, how are you?'},
@@ -76,6 +79,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Jes,',b:'jes',n:1},{d:' mi',b:'mi',n:1},{d:' loĝ',b:'loĝ',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' Uson',b:'uson',n:1},{d:'o.',b:'o',n:0}] },
     { id:8, skill:'Introduce yourself', translations:{zh:'对不起，我是初学者。',ja:'すみません、私は初心者です。',en:'Sorry, I am a beginner.'},
       morfemoj:[{d:'Pardon',b:'pardon',n:1},{d:'u,',b:'u',n:1},{d:' mi',b:'mi',n:1},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' komenc',b:'komenc',n:1},{d:'ant',b:'ant',n:1},{d:'o.',b:'o',n:0}] },
+    // Describe the weather
     { id:9, skill:'Describe the weather', translations:{zh:'伦敦的天气好吗？',ja:'ロンドンの天気は良いですか？',en:'Is the weather in London good?'},
       morfemoj:[{d:'Ĉu',b:'ĉu',n:1},{d:' la',b:'la',n:1},{d:' veter',b:'veter',n:1},{d:'o',b:'o',n:0},{d:' en',b:'en',n:1},{d:' London',b:'london',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' bon',b:'bon',n:1},{d:'a?',b:'a',n:0}] },
     { id:10, skill:'Describe the weather', translations:{zh:'今天天气很暖和，而且出太阳了。',ja:'今日は暖かい日で、太陽が輝いています。',en:'Today is a warm day and the sun shines.'},
@@ -89,6 +93,7 @@ const SENTENCES_RAW = [
     { id:14, skill:'Describe the weather', translations:{zh:'早上在下雨。',ja:'朝は雨が降っています。',en:'It rains in the morning.'},
       morfemoj:[{d:'Pluv',b:'pluv',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' la',b:'la',n:1},{d:' maten',b:'maten',n:1},{d:'o.',b:'o',n:0}] },
     // -----Score: 7
+    // Talk about people
     { id:15, skill:'Talk about people', translations:{zh:'男人们在办公室工作吗？',ja:'男性はオフィスで働いていますか？',en:'Do the men work in an office?'},
       morfemoj:[{d:'Ĉu',b:'ĉu',n:1},{d:' la',b:'la',n:1},{d:' vir',b:'vir',n:1},{d:'oj',b:'oj',n:0},{d:' labor',b:'labor',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' ofic',b:'ofic',n:1},{d:'ej',b:'ej',n:1},{d:'o?',b:'o',n:0}] },
     { id:16, skill:'Talk about people', translations:{zh:'他们在咖啡馆工作。',ja:'彼らはカフェで働いています。',en:'They work in a cafe.'},
@@ -99,6 +104,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Jen',b:'jen',n:1},{d:' ambaŭ',b:'ambaŭ',n:1},{d:' ge',b:'ge',n:1},{d:'patr',b:'patr',n:1},{d:'oj!',b:'oj',n:0}] },
     { id:19, skill:'Talk about people', translations:{zh:'索菲娅和亚当是好父母吗？',ja:'ソフィアとアダムは良い両親ですか？',en:'Are Sofia and Adam good parents?'},
       morfemoj:[{d:'Ĉu',b:'ĉu',n:1},{d:' Sofi',b:'sofi',n:1},{d:'a',b:'a',n:0},{d:' kaj',b:'kaj',n:1},{d:' Adam',b:'adam',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' bon',b:'bon',n:1},{d:'aj',b:'aj',n:0},{d:' ge',b:'ge',n:1},{d:'patr',b:'patr',n:1},{d:'oj?',b:'oj',n:0}] },
+    // Describe daily life
     { id:20, skill:'Describe daily life', translations:{zh:'索菲娅在睡觉，因为她很累。',ja:'ソフィアは寝ています、なぜなら彼女は疲れているからです。',en:'Sofia sleeps because she is tired.'},
       morfemoj:[{d:'Sofi',b:'sofi',n:1},{d:'a',b:'a',n:0},{d:' dorm',b:'dorm',n:1},{d:'as,',b:'as',n:1},{d:' ĉar',b:'ĉar',n:1},{d:' ŝi',b:'ŝi',n:1},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' lac',b:'lac',n:1},{d:'a.',b:'a',n:0}] },
     { id:21, skill:'Describe daily life', translations:{zh:'索菲亚去公园。',ja:'ソフィアは公園へ行きます。',en:'Sofia goes to the park.'},
@@ -110,6 +116,7 @@ const SENTENCES_RAW = [
     { id:24, skill:'Describe daily life', translations:{zh:'我很高兴，因为我今天不工作。',ja:'私は幸せです、なぜなら今日は働かないからです。',en:'I am happy because I don\'t work today.'},
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' feliĉ',b:'feliĉ',n:1},{d:'a,',b:'a',n:0},{d:' ĉar',b:'ĉar',n:1},{d:' mi',b:'mi',n:1},{d:' ne',b:'ne',n:1},{d:' labor',b:'labor',n:1},{d:'as',b:'as',n:1},{d:' hodiaŭ.',b:'hodiaŭ',n:1}] },
     // -----Score: 8
+    // Use direct objects
     { id:25, skill:'Use direct objects', translations:{zh:'你爱她还是我？',ja:'あなたは彼女を愛していますか、それとも私を？',en:'Do you love her or me?'},
       morfemoj:[{d:'Ĉu',b:'ĉu',n:1},{d:' vi',b:'vi',n:1},{d:' am',b:'am',n:2},{d:'as',b:'as',n:1},{d:' ŝi',b:'ŝi',n:1},{d:'n',b:'n',n:0},{d:' aŭ',b:'aŭ',n:1},{d:' mi',b:'mi',n:1},{d:'n?',b:'n',n:0}] },
     { id:26, skill:'Use direct objects', translations:{zh:'我爱你！',ja:'私はあなたを愛しています！',en:'I love you!'},
@@ -118,6 +125,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'La',b:'la',n:1},{d:' vir',b:'vir',n:1},{d:'in',b:'in',n:1},{d:'oj',b:'oj',n:0},{d:' ŝat',b:'ŝat',n:1},{d:'as',b:'as',n:1},{d:' grand',b:'grand',n:1},{d:'ajn',b:'ajn',n:0},{d:' kaf',b:'kaf',n:1},{d:'ej',b:'ej',n:1},{d:'ojn.',b:'ojn',n:0}] },
     { id:28, skill:'Use direct objects', translations:{zh:'他们在咖啡馆里看见很多人。',ja:'彼らはカフェでたくさんの人を見ます。',en:'They see many people in the cafe.'},
       morfemoj:[{d:'Ili',b:'ili',n:1},{d:' vid',b:'vid',n:1},{d:'as',b:'as',n:1},{d:' mult',b:'mult',n:1},{d:'ajn',b:'ajn',n:0},{d:' hom',b:'hom',n:1},{d:'ojn',b:'ojn',n:0},{d:' en',b:'en',n:1},{d:' la',b:'la',n:1},{d:' kaf',b:'kaf',n:1},{d:'ej',b:'ej',n:1},{d:'o.',b:'o',n:0}] },
+    // Use possessive pronouns
     { id:29, skill:'Use possessive pronouns', translations:{zh:'她的父母住在美国。',ja:'彼女の両親はアメリカに住んでいます。',en:'Her parents live in the USA.'},
       morfemoj:[{d:'Ŝi',b:'ŝi',n:1},{d:'aj',b:'aj',n:0},{d:' ge',b:'ge',n:1},{d:'patr',b:'patr',n:1},{d:'oj',b:'oj',n:0},{d:' loĝ',b:'loĝ',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' Uson',b:'uson',n:1},{d:'o.',b:'o',n:0}] },
     { id:30, skill:'Use possessive pronouns', translations:{zh:'这是我们大学的教师们。',ja:'これが私たちの大学の教師たちです。',en:'These are the teachers of our university.'},
@@ -131,7 +139,7 @@ const SENTENCES_RAW = [
     { id:34, skill:'Use possessive pronouns', translations:{zh:'我们祖父的房子在伦敦。',ja:'私たちの祖父の家はロンドンにあります。',en:'Our grandfather\'s house is in London.'},
       morfemoj:[{d:'La',b:'la',n:1},{d:' dom',b:'dom',n:1},{d:'o',b:'o',n:0},{d:' de',b:'de',n:1},{d:' ni',b:'ni',n:1},{d:'a',b:'a',n:0},{d:' av',b:'av',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' London',b:'london',n:1},{d:'o.',b:'o',n:0}] },
     // -----Score: 9
-    // ---------- 35-86: 6月27日版新增 ----------
+    // Talk about languages
     { id:35, skill:'Talk about languages', translations:{zh:'你好，你说世界语吗？',ja:'こんにちは、あなたはエスペラントを話しますか？',en:'Hello, do you speak Esperanto?'},
       morfemoj:[{d:'Salut',b:'salut',n:1},{d:'on,',b:'on',n:0},{d:' ĉu',b:'ĉu',n:1},{d:' vi',b:'vi',n:1},{d:' parol',b:'parol',n:1},{d:'as',b:'as',n:1},{d:' Esperant',b:'esperant',n:1},{d:'on?',b:'on',n:0}] },
     { id:36, skill:'Talk about languages', translations:{zh:'我说一点世界语。',ja:'私は少しエスペラントを話します。',en:'I speak Esperanto a little.'},
@@ -144,6 +152,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Ni',b:'ni',n:1},{d:' leg',b:'leg',n:1},{d:'as',b:'as',n:1},{d:' kaj',b:'kaj',n:1},{d:' skrib',b:'skrib',n:1},{d:'as.',b:'as',n:1}] },
     { id:40, skill:'Talk about languages', translations:{zh:'你说意大利语、法语、西班牙语还是德语？',ja:'あなたはイタリア語、フランス語、スペイン語、それともドイツ語を話しますか？',en:'Do you speak Italian, French, Spanish or German?'},
       morfemoj:[{d:'Ĉu',b:'ĉu',n:1},{d:' vi',b:'vi',n:1},{d:' parol',b:'parol',n:1},{d:'as',b:'as',n:1},{d:' la',b:'la',n:1},{d:' ital',b:'ital',n:1},{d:'an,',b:'an',n:0},{d:' la',b:'la',n:1},{d:' franc',b:'franc',n:1},{d:'an,',b:'an',n:0},{d:' la',b:'la',n:1},{d:' hispan',b:'hispan',n:1},{d:'an',b:'an',n:0},{d:' aŭ',b:'aŭ',n:1},{d:' la',b:'la',n:1},{d:' german',b:'german',n:1},{d:'an?',b:'an',n:0}] },
+    // Describe colors
     { id:41, skill:'Describe colors', translations:{zh:'苹果是红色的。',ja:'リンゴは赤いです。',en:'The apple is red.'},
       morfemoj:[{d:'La',b:'la',n:1},{d:' pom',b:'pom',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' ruĝ',b:'ruĝ',n:1},{d:'a.',b:'a',n:0}] },
     { id:42, skill:'Describe colors', translations:{zh:'他有一朵蓝色的花。',ja:'彼は青い花を持っています。',en:'He has a blue flower.'},
@@ -155,6 +164,7 @@ const SENTENCES_RAW = [
     { id:45, skill:'Describe colors', translations:{zh:'太阳是黄色的，不是吗？',ja:'太陽は黄色いですよね？',en:'The sun is yellow, isn\'t it?'},
       morfemoj:[{d:'La',b:'la',n:1},{d:' sun',b:'sun',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' flav',b:'flav',n:1},{d:'a,',b:'a',n:0},{d:' ĉu',b:'ĉu',n:1},{d:' ne?',b:'ne',n:1}] },
     // -----Score: 10-----Section 1 Finished
+    // Talk about food
     { id:46, skill:'Talk about food', translations:{zh:'你喝茶吗？',ja:'あなたはお茶を飲みますか？',en:'Do you drink tea?'},
       morfemoj:[{d:'Ĉu',b:'ĉu',n:1},{d:' vi',b:'vi',n:1},{d:' trink',b:'trink',n:1},{d:'as',b:'as',n:1},{d:' te',b:'te',n:1},{d:'on?',b:'on',n:0}] },
     { id:47, skill:'Talk about food', translations:{zh:'我喝水。',ja:'私は水を飲みます。',en:'I drink water.'},
@@ -167,6 +177,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Ni',b:'ni',n:1},{d:'a',b:'a',n:0},{d:' tag',b:'tag',n:1},{d:'manĝ',b:'manĝ',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' sen',b:'sen',n:1},{d:' viand',b:'viand',n:1},{d:'o;',b:'o',n:0},{d:' ĝi',b:'ĝi',n:1},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' vegetar',b:'vegetar',n:1},{d:'a.',b:'a',n:0}] },
     { id:51, skill:'Talk about food', translations:{zh:'感谢美味的晚餐！',ja:'おいしい夕食をありがとう！',en:'Thanks for the delicious dinner!'},
       morfemoj:[{d:'Dank',b:'dank',n:1},{d:'on',b:'on',n:0},{d:' pro',b:'pro',n:1},{d:' la',b:'la',n:1},{d:' bon',b:'bon',n:1},{d:'gust',b:'gust',n:1},{d:'a',b:'a',n:0},{d:' vesper',b:'vesper',n:1},{d:'manĝ',b:'manĝ',n:1},{d:'o!',b:'o',n:0}] },
+    // Discuss countries
     { id:52, skill:'Discuss countries', translations:{zh:'法国是欧洲的一个国家。',ja:'フランスはヨーロッパの国です。',en:'France is a country in Europe.'},
       morfemoj:[{d:'Franc',b:'franc',n:1},{d:'i',b:'i',n:3},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' land',b:'land',n:1},{d:'o',b:'o',n:0},{d:' en',b:'en',n:1},{d:' Eŭrop',b:'eŭrop',n:1},{d:'o.',b:'o',n:0}] },
     { id:53, skill:'Discuss countries', translations:{zh:'日本人在日本说日语。',ja:'日本人は日本で日本語を話します。',en:'Japanese people in Japan speak Japanese.'},
@@ -179,6 +190,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Ni',b:'ni',n:1},{d:' vojaĝ',b:'vojaĝ',n:1},{d:'as',b:'as',n:1},{d:' al',b:'al',n:2},{d:' kongres',b:'kongres',n:1},{d:'o',b:'o',n:0},{d:' en',b:'en',n:1},{d:' Ital',b:'ital',n:1},{d:'i',b:'i',n:3},{d:'o.',b:'o',n:0}] },
     { id:57, skill:'Discuss countries', translations:{zh:'旅途愉快！',ja:'良い旅を！',en:'Have a good trip!'},
       morfemoj:[{d:'Bon',b:'bon',n:1},{d:'an',b:'an',n:0},{d:' vojaĝ',b:'vojaĝ',n:1},{d:'on!',b:'on',n:0}] },
+    // Talk about animals
     { id:58, skill:'Talk about animals', translations:{zh:'他们的马去公园。',ja:'彼らの馬は公園に行きます。',en:'Their horses go to the park.'},
       morfemoj:[{d:'Ili',b:'ili',n:1},{d:'aj',b:'aj',n:0},{d:' ĉeval',b:'ĉeval',n:1},{d:'oj',b:'oj',n:0},{d:' ir',b:'ir',n:1},{d:'as',b:'as',n:1},{d:' al',b:'al',n:2},{d:' la',b:'la',n:1},{d:' park',b:'park',n:1},{d:'o.',b:'o',n:0}] },
     { id:59, skill:'Talk about animals', translations:{zh:'我看见花上有一只蜜蜂。',ja:'私は花に蜂を見ます。',en:'I see a bee in the flower.'},
@@ -190,6 +202,7 @@ const SENTENCES_RAW = [
     { id:62, skill:'Talk about animals', translations:{zh:'小羊是绵羊的幼崽。',ja:'子羊は羊の子供です。',en:'Lambs are young of sheep.'},
       morfemoj:[{d:'Ŝaf',b:'ŝaf',n:1},{d:'id',b:'id',n:1},{d:'oj',b:'oj',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' id',b:'id',n:1},{d:'oj',b:'oj',n:0},{d:' de',b:'de',n:1},{d:' ŝaf',b:'ŝaf',n:1},{d:'oj.',b:'oj',n:0}] },
     // -----Score: 11
+    // Discuss food
     { id:63, skill:'Discuss food', translations:{zh:'我不在吃饭时喝果汁。',ja:'私は食事と一緒にジュースを飲みません。',en:'I don\'t drink juice with the meal.'},
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:' ne',b:'ne',n:1},{d:' trink',b:'trink',n:1},{d:'as',b:'as',n:1},{d:' suk',b:'suk',n:1},{d:'on',b:'on',n:0},{d:' kun',b:'kun',n:1},{d:' la',b:'la',n:1},{d:' manĝ',b:'manĝ',n:1},{d:'o.',b:'o',n:0}] },
     { id:64, skill:'Discuss food', translations:{zh:'你吃多少面包？',ja:'あなたはパンをいくら食べますか？',en:'How much bread do you eat?'},
@@ -202,6 +215,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Suk',b:'suk',n:1},{d:'o',b:'o',n:0},{d:' ne',b:'ne',n:1},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' manĝ',b:'manĝ',n:1},{d:'aĵ',b:'aĵ',n:1},{d:'o,',b:'o',n:0},{d:' sed',b:'sed',n:1},{d:' trink',b:'trink',n:1},{d:'aĵ',b:'aĵ',n:1},{d:'o.',b:'o',n:0}] },
     { id:68, skill:'Discuss food', translations:{zh:'我想要食谱，因为我非常喜欢你的蛋糕。',ja:'私はレシピが欲しいです、なぜなら私はあなたのケーキがとても好きだからです。',en:'I want the recipe, because I like your cake very much.'},
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:' vol',b:'vol',n:1},{d:'as',b:'as',n:1},{d:' la',b:'la',n:1},{d:' recept',b:'recept',n:1},{d:'on,',b:'on',n:0},{d:' ĉar',b:'ĉar',n:1},{d:' mi',b:'mi',n:1},{d:' tre',b:'tre',n:1},{d:' ŝat',b:'ŝat',n:1},{d:'as',b:'as',n:1},{d:' vi',b:'vi',n:1},{d:'an',b:'an',n:0},{d:' kuk',b:'kuk',n:1},{d:'on.',b:'on',n:0}] },
+    // Describe your clothing
     { id:69, skill:'Describe your clothing', translations:{zh:'裙子很短。',ja:'スカートは短いです。',en:'The skirt is short.'},
       morfemoj:[{d:'La',b:'la',n:1},{d:' jup',b:'jup',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' mal',b:'mal',n:1},{d:'long',b:'long',n:1},{d:'a.',b:'a',n:0}] },
     { id:70, skill:'Describe your clothing', translations:{zh:'我的裤子有四个口袋。',ja:'私のズボンには四つのポケットがあります。',en:'My pants have four pockets.'},
@@ -214,6 +228,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Neĝ',b:'neĝ',n:1},{d:'as,',b:'as',n:1},{d:' kaj',b:'kaj',n:1},{d:' mi',b:'mi',n:1},{d:' port',b:'port',n:1},{d:'as',b:'as',n:1},{d:' ĉapel',b:'ĉapel',n:1},{d:'on,',b:'on',n:0},{d:' mantel',b:'mantel',n:1},{d:'on',b:'on',n:0},{d:' kaj',b:'kaj',n:1},{d:' gant',b:'gant',n:1},{d:'ojn.',b:'ojn',n:0}] },
     { id:74, skill:'Describe your clothing', translations:{zh:'你的袜子在你左边的靴子里。',ja:'あなたの靴下は左のブーツの中にあります。',en:'Your sock is in your left boot.'},
       morfemoj:[{d:'Vi',b:'vi',n:1},{d:'a',b:'a',n:0},{d:' ŝtrump',b:'ŝtrump',n:1},{d:'et',b:'et',n:1},{d:'o',b:'o',n:0},{d:' est',b:'est',n:1},{d:'as',b:'as',n:1},{d:' en',b:'en',n:1},{d:' vi',b:'vi',n:1},{d:'a',b:'a',n:0},{d:' mal',b:'mal',n:1},{d:'dekstr',b:'dekstr',n:1},{d:'a',b:'a',n:0},{d:' bot',b:'bot',n:1},{d:'o.',b:'o',n:0}] },
+    // Ask questions
     { id:75, skill:'Ask questions', translations:{zh:'有多少人在这里学习世界语？',ja:'ここで何人がエスペラントを学んでいますか？',en:'How many people learn Esperanto here?'},
       morfemoj:[{d:'Ki',b:'ki',n:1},{d:'om',b:'om',n:1},{d:' da',b:'da',n:1},{d:' hom',b:'hom',n:1},{d:'oj',b:'oj',n:0},{d:' lern',b:'lern',n:1},{d:'as',b:'as',n:1},{d:' Esperant',b:'esperant',n:1},{d:'on',b:'on',n:0},{d:' ĉi',b:'ĉi',n:2},{d:' ti',b:'ti',n:1},{d:'e?',b:'e',n:0}] },
     { id:76, skill:'Ask questions', translations:{zh:'你想什么时候吃饭？',ja:'いつ食べたいですか？',en:'When do you want to eat?'},
@@ -227,6 +242,7 @@ const SENTENCES_RAW = [
     { id:80, skill:'Ask questions', translations:{zh:'你的父母想去哪里？',ja:'あなたの両親はどこへ行きたいですか？',en:'Where do your parents want to go?'},
       morfemoj:[{d:'Ki',b:'ki',n:1},{d:'en',b:'en',n:0},{d:' vi',b:'vi',n:1},{d:'aj',b:'aj',n:0},{d:' ge',b:'ge',n:1},{d:'patr',b:'patr',n:1},{d:'oj',b:'oj',n:0},{d:' vol',b:'vol',n:1},{d:'as',b:'as',n:1},{d:' ir',b:'ir',n:1},{d:'i?',b:'i',n:1}] },
     // -----Score: 12
+    // Use the present tense
     { id:81, skill:'Use the present tense', translations:{zh:'她想给你寄一封信。',ja:'彼女はあなたに手紙を送りたいです。',en:'She wants to send you a letter.'},
       morfemoj:[{d:'Ŝi',b:'ŝi',n:1},{d:' vol',b:'vol',n:1},{d:'as',b:'as',n:1},{d:' send',b:'send',n:1},{d:'i',b:'i',n:1},{d:' al',b:'al',n:2},{d:' vi',b:'vi',n:1},{d:' leter',b:'leter',n:1},{d:'on.',b:'on',n:0}] },
     { id:82, skill:'Use the present tense', translations:{zh:'如果我不睡觉，我就不能好好工作。',ja:'もし私が寝なければ、私はうまく働けません。',en:'If I don\'t sleep, I can\'t work well.'},
@@ -239,7 +255,6 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Li',b:'li',n:1},{d:' komenc',b:'komenc',n:1},{d:'as',b:'as',n:1},{d:' stud',b:'stud',n:1},{d:'i',b:'i',n:1},{d:' Esperant',b:'esperant',n:1},{d:'on.',b:'on',n:0}] },
     { id:86, skill:'Use the present tense', translations:{zh:'我需要帮助，我请求。',ja:'私は助けが必要で、お願いします。',en:'I need help, please.'},
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:' bezon',b:'bezon',n:1},{d:'as',b:'as',n:1},{d:' help',b:'help',n:1},{d:'on,',b:'on',n:0},{d:' mi',b:'mi',n:1},{d:' pet',b:'pet',n:1},{d:'as.',b:'as',n:1}] },
-    // ---------- 87-364: 7月12日版新增 ----------
     // Talk about your family
     { id:87, skill:'Talk about your family', translations:{zh:'我的姐姐只有一个女儿。',ja:'私の姉は一人娘しかいません。',en:'My sister has only one daughter.'},
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:'a',b:'a',n:0},{d:' frat',b:'frat',n:1},{d:'in',b:'in',n:1},{d:'o',b:'o',n:0},{d:' hav',b:'hav',n:1},{d:'as',b:'as',n:1},{d:' nur',b:'nur',n:1},{d:' unu',b:'unu',n:1},{d:' fil',b:'fil',n:1},{d:'in',b:'in',n:1},{d:'on.',b:'on',n:0}] },
@@ -523,7 +538,6 @@ const SENTENCES_RAW = [
     { id:212, skill:'Talk about abstract actions', translations:{zh:'这些事不关我的事。',ja:'そのようなことは私には関係ありません。',en:'Such matters do not concern me.'},
       morfemoj:[{d:'Ti',b:'ti',n:1},{d:'aj',b:'aj',n:0},{d:' afer',b:'afer',n:1},{d:'oj',b:'oj',n:0},{d:' ne',b:'ne',n:1},{d:' koncern',b:'koncern',n:1},{d:'as',b:'as',n:1},{d:' mi',b:'mi',n:1},{d:'n.',b:'n',n:0}] },
     // -----Score: 20-----Section 2 Finished
-    // ---------- 213-?: 7月12日生成，8月8日已检查 ----------
     // Use the -iĝ suffix
     { id:213, skill:'Use the -iĝ suffix', translations:{zh:'太阳太早把我唤醒了。',ja:'太陽が早すぎて私を目覚めさせました。',en:'The sun woke me up too early.'},
       morfemoj:[{d:'La',b:'la',n:1},{d:' sun',b:'sun',n:1},{d:'o',b:'o',n:0},{d:' vek',b:'vek',n:1},{d:'is',b:'is',n:1},{d:' mi',b:'mi',n:1},{d:'n',b:'n',n:0},{d:' tro',b:'tro',n:1},{d:' fru',b:'fru',n:1},{d:'e.',b:'e',n:0}] },
@@ -822,7 +836,7 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'Mi',b:'mi',n:1},{d:' kaj',b:'kaj',n:1},{d:' admir',b:'admir',n:1},{d:'as',b:'as',n:1},{d:' kaj',b:'kaj',n:1},{d:' am',b:'am',n:2},{d:'eg',b:'eg',n:1},{d:'as',b:'as',n:1},{d:' vi',b:'vi',n:1},{d:'n.',b:'n',n:0}] },
     // Discuss Esperanto culture
     { id:344, skill:'Discuss Esperanto culture', translations:{zh:'《世界语第一书》出版于1887年。',ja:'『エスペラント第一書』は1887年に出版されました。',en:'The First Book of Esperanto was published in 1887.'},
-      morfemoj:[{d:'La',b:'la',n:1},{d:' Unu',b:'unu',n:1},{d:'a',b:'a',n:0},{d:' Libr',b:'libr',n:1},{d:'o',b:'o',n:0},{d:' de',b:'de',n:1},{d:' Esperant',b:'esperant',n:1},{d:'o',b:'o',n:0},{d:' aper',b:'aper',n:1},{d:'is',b:'is',n:1},{d:' en',b:'en',n:1},{d:' 1887.',b:'1887',n:1}] },
+      morfemoj:[{d:'La',b:'la',n:1},{d:' Unu',b:'unu',n:1},{d:'a',b:'a',n:0},{d:' Libr',b:'libr',n:1},{d:'o',b:'o',n:0},{d:' de',b:'de',n:1},{d:' Esperant',b:'esperant',n:1},{d:'o',b:'o',n:0},{d:' aper',b:'aper',n:1},{d:'is',b:'is',n:1},{d:' en',b:'en',n:1},{d:' 1',b:'mil',n:1},{d:'8',b:'ok',n:1},{d:'',b:'cent',n:1},{d:'8',b:'ok',n:1},{d:'',b:'dek',n:1},{d:'7.',b:'sep',n:1}] },
     { id:345, skill:'Discuss Esperanto culture', translations:{zh:'明年世界大会将在哪里举行？',ja:'来年の世界大会はどこで開催されますか？',en:'Where will the Universal Congress be held next year?'},
       morfemoj:[{d:'Ki',b:'ki',n:1},{d:'e',b:'e',n:0},{d:' okaz',b:'okaz',n:1},{d:'os',b:'os',n:1},{d:' la',b:'la',n:1},{d:' Universal',b:'universal',n:1},{d:'a',b:'a',n:0},{d:' Kongres',b:'kongres',n:1},{d:'o',b:'o',n:0},{d:' ven',b:'ven',n:1},{d:'ont',b:'ont',n:1},{d:'jar',b:'jar',n:1},{d:'e?',b:'e',n:0}] },
     { id:346, skill:'Discuss Esperanto culture', translations:{zh:'初学者有权说母语（krokodili）。',ja:'初心者はエスペラント以外の言語を話す権利があります（クロコディリ）。',en:'A beginner has the right to speak their mother tongue (krokodili).'},
@@ -872,32 +886,37 @@ const SENTENCES_RAW = [
       morfemoj:[{d:'lund',b:'lund',n:1},{d:'o,',b:'o',n:0},{d:' mard',b:'mard',n:1},{d:'o,',b:'o',n:0},{d:' merkred',b:'merkred',n:1},{d:'o,',b:'o',n:0},{d:' ĵaŭd',b:'ĵaŭd',n:1},{d:'o,',b:'o',n:0},{d:' vendred',b:'vendred',n:1},{d:'o,',b:'o',n:0},{d:' sabat',b:'sabat',n:1},{d:'o,',b:'o',n:0},{d:' dimanc',b:'dimanc',n:1},{d:'o;',b:'o',n:0},
         {d:' januar',b:'januar',n:1},{d:'o,',b:'o',n:0},{d:' februar',b:'februar',n:1},{d:'o,',b:'o',n:0},{d:' mart',b:'mart',n:1},{d:'o,',b:'o',n:0},{d:' april',b:'april',n:1},{d:'o,',b:'o',n:0},{d:' maj',b:'maj',n:1},{d:'o,',b:'o',n:0},{d:' juni',b:'juni',n:1},{d:'o,',b:'o',n:0},
         {d:' juli',b:'juli',n:1},{d:'o,',b:'o',n:0},{d:' aŭgust',b:'aŭgust',n:1},{d:'o,',b:'o',n:0},{d:' septembr',b:'septembr',n:1},{d:'o,',b:'o',n:0},{d:' oktobr',b:'oktobr',n:1},{d:'o,',b:'o',n:0},{d:' novembr',b:'novembr',n:1},{d:'o,',b:'o',n:0},{d:' decembr',b:'decembr',n:1},{d:'o.',b:'o',n:0}] },
-    { id:366, skill:'补充：人名专名地名', translations:{zh:'柴门霍夫，莉迪亚；请看英文翻译；北美洲、南美洲、亚洲，柏林，比亚里斯托克，纽约，伦敦，巴黎，北京，罗马，鹿特丹，多伦多',ja:'英語の翻訳を参照してください',en:'Zamenhof, Lidia; International Youth Congress of Esperanto, Unabridged Illustrated Dictionary, Muzaiko, World Esperanto Youth Organization, World Esperanto Association, Universala Kongreso, Wikipedia, Vinilkosmo; North America, South America, Asia, Berlin, Białystok, New York, London, Paris, Beijing, Rome, Rotterdam, Toronto.'},
+    { id:366, skill:'补充：人名专名地名', translations:{zh:'柴门霍夫，莉迪亚；国际世界语青年大会、《世界语插图大词典》、Muzaiko、世界青年世界语组织、国际世界语协会、国际世界语大会、维基百科、Vinilkosmo；北美洲、南美洲、亚洲，柏林，比亚里斯托克，纽约，伦敦，巴黎，北京，罗马，鹿特丹，多伦多',
+      ja:'ザメンホフ、リディア；国際エスペラント青年大会（IJK）、『エスペラント図解大辞典』（PIV）、Muzaiko、世界青年エスペラント組織（TEJO）、国際エスペラント協会（UEA）、国際エスペラント大会（UK）、ウィキペディア、Vinilkosmo；北アメリカ、南アメリカ、アジア、ベルリン、ビャウィストク、ニューヨーク、ロンドン、パリ、北京、ローマ、ロッテルダム、トロント',
+      en:'Zamenhof, Lidia; International Youth Congress of Esperanto, Unabridged Illustrated Dictionary, Muzaiko, World Esperanto Youth Organization, World Esperanto Association, Universala Kongreso, Wikipedia, Vinilkosmo; North America, South America, Asia, Berlin, Białystok, New York, London, Paris, Beijing, Rome, Rotterdam, Toronto.'},
       morfemoj:[{d:'Zamenhof,',b:'zamenhof',n:1},{d:' Lidj',b:'lidj',n:1},{d:'a;',b:'a',n:0},{d:' IJK,',b:'ijk',n:1},{d:' PIV,',b:'piv',n:1},{d:' Muzaik',b:'muzaik',n:1},{d:'o,',b:'o',n:0},{d:' TEJO,',b:'tejo',n:1},{d:' UEA,',b:'uea',n:1},{d:' UK,',b:'uk',n:1},{d:' vikipedi',b:'vikipedi',n:1},{d:'o,',b:'o',n:0},{d:' vinilkosm',b:'vinilkosm',n:1},{d:'o;',b:'o',n:0},
         {d:' nord',b:'nord',n:1},{d:'amerik',b:'amerik',n:1},{d:'o,',b:'o',n:0},{d:' sud',b:'sd',n:1},{d:'amerik',b:'amerik',n:1},{d:'o,',b:'o',n:0},{d:' azi',b:'azi',n:1},{d:'o,',b:'o',n:0},{d:' Berlin',b:'berlin',n:1},{d:'o,',b:'o',n:0},{d:' Bjalistok',b:'bjalistok',n:1},{d:'o,',b:'o',n:0},{d:' Nov',b:'nov',n:1},{d:'jork',b:'jork',n:1},{d:'o,',b:'o',n:0},{d:' London',b:'london',n:1},{d:'o,',b:'o',n:0},{d:' Pariz',b:'pariz',n:1},{d:'o,',b:'o',n:0},{d:' Pekin',b:'pekin',n:1},{d:'o,',b:'o',n:0},{d:' Rom',b:'rom',n:1},{d:'o,',b:'o',n:0},{d:' Roterdam',b:'roterdam',n:1},{d:'o,',b:'o',n:0},{d:' Toront',b:'toront',n:1},{d:'o.',b:'o',n:0}] },
-    { id:367, skill:'补充：国家语言名', translations:{zh:'请看英文翻译',ja:'英語の翻訳を参照してください',en:'Argentina, Australia, India, Brazil, Britain, Bulgarian, Czechia, Chile, Chinese, Danish, Finnish, French, German, Hebrew, Hindi, Spanish, Hungarian, Indonesian, Icelandic, Italian, Japanese, Canada, Croatian, Cuba, Mexico, Mongolian, the Netherlands, Nepalese, Norwegian, Poland, Portuguese, Romanian, Russian, Slovak, Swedish, Tamil, Togo, Ukrainian, the USA, Vietnamese.'},
+    { id:367, skill:'补充：国家语言名', translations:{zh:'阿根廷，澳大利亚，印度，巴西，英国，保加利亚语，捷克，智利，汉语，丹麦语，芬兰语，法语，德语，希伯来语，印地语，西班牙语，匈牙利语，印度尼西亚语，冰岛语，意大利语，日语，加拿大，克罗地亚语，古巴，墨西哥，蒙古语，荷兰，尼泊尔语，挪威语，波兰，葡萄牙语，罗马尼亚语，俄语，斯洛伐克语，瑞典语，泰米尔语，多哥，乌克兰语，美国，越南语',
+      ja:'アルゼンチン、オーストラリア、インド、ブラジル、イギリス、ブルガリア語、チェコ、チリ、中国語、デンマーク語、フィンランド語、フランス語、ドイツ語、ヘブライ語、ヒンディー語、スペイン語、ハンガリー語、インドネシア語、アイスランド語、イタリア語、日本語、カナダ、クロアチア語、キューバ、メキシコ、モンゴル語、オランダ、ネパール語、ノルウェー語、ポーランド、ポルトガル語、ルーマニア語、ロシア語、スロバキア語、スウェーデン語、タミル語、トーゴ、ウクライナ語、アメリカ、ベトナム語',
+      en:'Argentina, Australia, India, Brazil, Britain, Bulgarian, Czechia, Chile, Chinese, Danish, Finnish, French, German, Hebrew, Hindi, Spanish, Hungarian, Indonesian, Icelandic, Italian, Japanese, Canada, Croatian, Cuba, Mexico, Mongolian, the Netherlands, Nepalese, Norwegian, Poland, Portuguese, Romanian, Russian, Slovak, Swedish, Tamil, Togo, Ukrainian, the USA, Vietnamese.'},
       morfemoj:[{d:'Argentin',b:'argentin',n:1},{d:'o,',b:'o',n:0},{d:' Aŭstrali',b:'aŭstrali',n:1},{d:'o,',b:'o',n:0},{d:' Barat',b:'barat',n:1},{d:'o,',b:'o',n:0},{d:' Brazil',b:'brazil',n:1},{d:'o,',b:'o',n:0},{d:' Brit',b:'brit',n:1},{d:'i',b:'i',n:3},{d:'o,',b:'o',n:0},{d:' bulgar',b:'bulgar',n:1},{d:'a,',b:'a',n:0},{d:' Ĉeĥ',b:'ĉeĥ',n:1},{d:'i',b:'i',n:3},{d:'o,',b:'o',n:0},{d:' Ĉili',b:'ĉili',n:1},{d:'o,',b:'o',n:0},{d:' Ĉin',b:'ĉin',n:1},{d:'i',b:'i',n:3},{d:'o,',b:'o',n:0},{d:' dan',b:'dan',n:1},{d:'a,',b:'a',n:0},{d:' finn',b:'finn',n:1},{d:'a,',b:'a',n:0},{d:' franc',b:'franc',n:1},{d:'a,',b:'a',n:0},{d:' german',b:'german',n:1},{d:'a,',b:'a',n:0},
         {d:' hebre',b:'hebre',n:1},{d:'a,',b:'a',n:0},{d:' hind',b:'hind',n:1},{d:'a,',b:'a',n:0},{d:' hispan',b:'hispan',n:1},{d:'a,',b:'a',n:0},{d:' hungar',b:'hungar',n:1},{d:'a,',b:'a',n:0},{d:' indonezi',b:'indonezi',n:1},{d:'a,',b:'a',n:0},{d:' island',b:'island',n:1},{d:'a,',b:'a',n:0},{d:' ital',b:'ital',n:1},{d:'a,',b:'a',n:0},{d:' Japan',b:'japan',n:1},{d:'i',b:'i',n:3},{d:'o,',b:'o',n:0},{d:' Kanad',b:'kanad',n:1},{d:'o,',b:'o',n:0},{d:' kroat',b:'kroat',n:1},{d:'a,',b:'a',n:0},{d:' Kub',b:'kub',n:1},{d:'o,',b:'o',n:0},{d:' Meksik',b:'meksik',n:1},{d:'o,',b:'o',n:0},{d:' Mongol',b:'mongol',n:1},{d:'a,',b:'a',n:0},{d:' Neder',b:'neder',n:1},{d:'land',b:'land',n:1},{d:'o,',b:'o',n:0},{d:' nepal',b:'nepal',n:1},{d:'a,',b:'a',n:0},{d:' norveg',b:'norveg',n:1},{d:'a,',b:'a',n:0},
         {d:' pol',b:'pol',n:1},{d:'land',b:'land',n:1},{d:'o,',b:'o',n:0},{d:' portugal',b:'portugal',n:1},{d:'a,',b:'a',n:0},{d:' ruman',b:'ruman',n:1},{d:'a,',b:'a',n:0},{d:' Rus',b:'rus',n:1},{d:'i',b:'i',n:3},{d:'o,',b:'o',n:0},{d:' slovak',b:'slovak',n:1},{d:'a,',b:'a',n:0},{d:' tamil',b:'tamil',n:1},{d:'a,',b:'a',n:0},{d:' Togo',b:'tog',n:1},{d:'land',b:'land',n:1},{d:'o,',b:'o',n:0},{d:' ukrain',b:'ukrain',n:1},{d:'a,',b:'a',n:0},{d:' Uson',b:'uson',n:1},{d:'o,',b:'o',n:0},{d:' vjetnam',b:'vjetnam',n:1},{d:'a.',b:'a',n:0}] }
 ];
 
 // ============================================================
-// 3. 社区数据
+// 3. n=0 特殊词尾默认汉字种子(合并模式 15 词尾;拆分模式下按拆分字符 a/e/o/u/n 取用)
+// 仅作为编辑器建议展示,不自动应用
 // ============================================================
 const COMMUNITY_DATA = {
-  'est': { '是':8,'为':2,'在':1 },
-  'bon': { '好':10,'佳':1 },
-  'varm': { '热':4,'暖':1 },
-  'labor': { '劳':1 },
-  'lud': { '玩':4,'戏':1 },
-  'am': { '爱':7,'喜':2 },
-  'ŝat': { '喜':5,'爱':1 },
-  'loĝ': { '住':6,'居':1 },
-  'vid': { '见':4,'看':2 },
-  'ir': { '去':5,'走':1 },
-  'fart': { '感':3 },
-  'dorm': { '眠':3,'睡':1 },
-  'lac': { '累':4,'倦':1 },
-  'grand': { '大':5,'巨':1 },
-  'patr': { '亲':2,'父':1 },
+  'n':   { '인':1 },   // 宾格
+  'e':   { '어':1 },   // 副词
+  'en':  { '언':1 },   // 方向
+  'o':   { '오':1 },   // 名词
+  'oj':  { '외':1 },   // 名词复数
+  'on':  { '온':1 },   // 名词宾格
+  'ojn': { '왼':1 },   // 名词复数宾格
+  'a':   { '아':1 },   // 形容词
+  'aj':  { '애':1 },   // 形容词复数
+  'an':  { '안':1 },   // 形容词宾格
+  'ajn': { '앤':1 },   // 形容词复数宾格
+  'u':   { '우':1 },   // 相关词
+  'uj':  { '위':1 },   // 相关词复数
+  'un':  { '운':1 },   // 相关词宾格
+  'ujn': { '윈':1 },   // 相关词复数宾格
 };

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>E-stacio · 世语译站</title>
+  <title>E-stacio · 世语驿站</title>
   <style>
     /* ===== 全局样式 – 绿色系 ===== */
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -265,6 +265,8 @@
     .contrib-page { background:var(--card); border-radius:12px; max-width:640px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.3); }
     .contrib-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
     .contrib-header h3 { margin:0; font-size:1.05rem; }
+    .contrib-actions { display:flex; gap:6px; align-items:center; }
+    .contrib-actions .glossary-sort-btn { margin-left:0; }
     .contrib-stats { padding:8px 18px; font-size:0.8rem; color:var(--text-light); border-bottom:1px dashed var(--border); }
     .contrib-list { overflow-y:auto; padding:10px 18px 18px; }
     .contrib-empty { color:var(--text-light); font-size:0.85rem; padding:18px 0; text-align:center; }
@@ -281,6 +283,8 @@
   </style>
 </head>
 
+<body>
+
 <div class="glossary-popup-overlay" id="popupOverlay" onclick="closeGlossaryPopup()"></div>
 <div class="glossary-popup" id="glossaryPopup"></div>
 <!-- ===== 社区贡献页 ===== -->
@@ -288,14 +292,17 @@
   <div class="contrib-page">
     <div class="contrib-header">
       <h3 data-i18n="contrib_title">Kontribuoj de la komunumo</h3>
-      <button class="sidebar-close" id="contribCloseBtn" title="Fermi">&times;</button>
+      <div class="contrib-actions">
+        <button id="contribImportBtn" class="glossary-sort-btn" title="Enporti kontribu-pakaĵon de alia uzanto（导入贡献包）"><span data-i18n="contrib_import">Importi pakon</span></button>
+        <button id="contribExportBtn" class="glossary-sort-btn" title="Elporti komunuman bazlinion kiel community-data.json（导出基线）"><span data-i18n="contrib_export">Elporti bazlinion</span></button>
+        <button class="sidebar-close" id="contribCloseBtn" title="Fermi">&times;</button>
+      </div>
     </div>
     <div class="contrib-stats" id="contribStats"></div>
     <div class="contrib-list" id="contribList"></div>
   </div>
 </div>
-
-<body>
+<input type="file" id="contribImportFile" accept=".json,application/json" style="display:none" />
 
 <div class="app-with-sidebar" id="app">
   <!-- ===== 抽屉式侧边栏 ===== -->
@@ -678,6 +685,40 @@ function computeEffectivePublic() {
     if (best) eff[key] = best;
   });
   APP.publicRepl = eff;
+}
+
+// 合并一份贡献数据进本地贡献库(按用户名去重,保留最新时间戳),返回新增键数
+function mergeContribIntoLocal(contrib) {
+  if (!contrib || typeof contrib !== 'object') return 0;
+  const before = Object.keys(APP.publicContrib).length;
+  Object.entries(contrib).forEach(([k, hanziMap]) => {
+    const slot = (APP.publicContrib[k] = APP.publicContrib[k] || {});
+    Object.entries(hanziMap).forEach(([h, info]) => {
+      const entry = (slot[h] = slot[h] || { c: 0, u: {} });
+      Object.assign(entry.u, info.u || {});
+      entry.c = Object.keys(entry.u).length;
+    });
+  });
+  persistPublicContrib();
+  computeEffectivePublic();
+  return Object.keys(APP.publicContrib).length - before;
+}
+
+// 启动时从同源仓库基线 community-data.json 合并社区贡献(只读同步;离线/file:// 下静默跳过)
+function fetchCommunityBaseline() {
+  if (typeof fetch !== 'function' || location.protocol === 'file:') return;
+  fetch('./community-data.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(data => {
+      if (!data || data.v !== 2 || !data.contrib || typeof data.contrib !== 'object') return;
+      const added = mergeContribIntoLocal(normalizeContribKeys(data.contrib));
+      if (added > 0) {
+        mergeGlobalReplacements();
+        renderAll();
+        showToast('Komunuma bazlinio: +' + added + ' ŝlosiloj', 'success');
+      }
+    })
+    .catch(() => {});  // 断网或文件异常时沿用本地数据,不影响学习
 }
 
 function saveState() {
@@ -1199,12 +1240,16 @@ function renderEditor() {
         document.getElementById('editorInput').value = currentRepl;
         document.getElementById('editorInput').focus();
 
-        // 社区建议:实时贡献(精确 b|n 键)优先,静态种子 COMMUNITY_DATA 补充
+        // 候选建议:实时贡献(精确 b|n 键)优先,n=0 词尾默认种子 COMMUNITY_DATA 补充
+        // 种子键:合并模式取整体词尾(如 ojn),拆分模式取拆分字符(如 o/j/n)
         const wrap = document.getElementById('suggestionsWrap');
         wrap.innerHTML = '<span class="sug-label" data-i18n="suggest_label">Elekto de aliaj:</span>';
         const gkey = computeGlobalKey(m, subIdx);
         const live = APP.publicContrib[gkey] || {};
-        const seed = COMMUNITY_DATA[m.b] || {};
+        const seedKey = (m.n === 0 && !APP.mergeMode && m.b.length > 1 && subIdx !== undefined && subIdx !== null)
+          ? (m.b.split('')[subIdx] || '').toLowerCase()
+          : m.b.toLowerCase();
+        const seed = COMMUNITY_DATA[seedKey] || {};
         const seenChars = new Set();
         const items = [];
         Object.entries(live).sort((a, b) => b[1].c - a[1].c).forEach(([char, info]) => {
@@ -1464,16 +1509,7 @@ function importData(file) {
         if (data.replacements) APP.replacements = data.replacements;
         // 合并社区贡献数据(按用户名去重,保留最新时间戳)
         if (data.publicContrib && typeof data.publicContrib === 'object') {
-          Object.entries(data.publicContrib).forEach(([k, hanziMap]) => {
-            const slot = (APP.publicContrib[k] = APP.publicContrib[k] || {});
-            Object.entries(hanziMap).forEach(([h, info]) => {
-              const entry = (slot[h] = slot[h] || { c: 0, u: {} });
-              Object.assign(entry.u, info.u || {});
-              entry.c = Object.keys(entry.u).length;
-            });
-          });
-          persistPublicContrib();
-          computeEffectivePublic();
+          mergeContribIntoLocal(data.publicContrib);
         }
         saveSentences(); saveState();
         APP.currentIndex = 0; closeEditor(); renderAll();
@@ -1482,6 +1518,36 @@ function importData(file) {
     } catch(err) { showToast('Eraro: ' + err.message, 'error'); }
   };
   reader.readAsText(file);
+}
+
+// 导入社区贡献包:只合并 publicContrib,不动例句与私有替换
+function importContribFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.publicContrib && typeof data.publicContrib === 'object') {
+        const added = mergeContribIntoLocal(normalizeContribKeys(data.publicContrib));
+        mergeGlobalReplacements();
+        renderAll();
+        renderContribPage();  // 贡献页当前已打开,刷新列表
+        showToast('Kontribuo enportita: +' + added + ' ŝlosiloj', 'success');
+      } else {
+        showToast('Neniu kontribua datumo en dosiero', 'error');
+      }
+    } catch (err) { showToast('Eraro: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+// 导出当前贡献库为仓库基线文件 community-data.json(维护者用)
+function exportCommunityBaseline() {
+  const data = { v: 2, contrib: APP.publicContrib };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'community-data.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('community-data.json elportita', 'success');
 }
 
 function resetData() {
@@ -1538,6 +1604,12 @@ function init() {
   // 社区贡献页
   document.getElementById('contribBtn').addEventListener('click', openContribPage);
   document.getElementById('contribCloseBtn').addEventListener('click', closeContribPage);
+  document.getElementById('contribImportBtn').addEventListener('click', () => document.getElementById('contribImportFile').click());
+  document.getElementById('contribImportFile').addEventListener('change', (e) => {
+    if (e.target.files.length > 0) importContribFile(e.target.files[0]);
+    e.target.value = '';
+  });
+  document.getElementById('contribExportBtn').addEventListener('click', exportCommunityBaseline);
 
   // 词汇表排序切换
   var sortBtn = document.getElementById('glossarySortBtn');
@@ -1628,7 +1700,8 @@ function init() {
 
   updateGlossary();
   renderAll();
-  showToast('Bonvenon al E-stacio · 世语译站', 'success');
+  showToast('Bonvenon al E-stacio · 世语驿站', 'success');
+  fetchCommunityBaseline();  // 异步合并仓库社区基线,失败不影响使用
   setTimeout(() => {
     const s = getCurrentSentence();
     if (s && Object.keys(APP.replacements).length === 0) {

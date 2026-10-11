@@ -136,16 +136,23 @@
     .admin-panel .admin-row .btn-admin-outline:hover { background:var(--accent); color:#fff; }
     .admin-panel .admin-row .btn-danger { background:#c0392b; color:#fff; }
     .admin-panel .admin-row .btn-danger:hover { background:#a93226; }
-    .admin-panel .morfemo-edit-list { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; padding:10px; background:#fff; border-radius:var(--radius-sm); border:1px solid var(--border); }
-    .admin-panel .morfemo-edit-item { display:flex; align-items:center; gap:4px; background:var(--bg); padding:2px 8px 2px 6px; border-radius:20px; font-size:0.8rem; flex-wrap:wrap; }
-    .admin-panel .morfemo-edit-item input { width:50px; padding:2px 4px; border:1px solid var(--border); border-radius:4px; font-size:0.8rem; }
-    .admin-panel .morfemo-edit-item input.display-input { width:70px; }
-    .admin-panel .morfemo-edit-item input.base-input { width:70px; }
-    .admin-panel .morfemo-edit-item input.number-input { width:40px; }
-    .admin-panel .morfemo-edit-item .del-btn { background:transparent; border:none; color:#c0392b; cursor:pointer; font-size:0.9rem; padding:0 2px; }
-    .admin-panel .admin-add-morfemo { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-    .admin-panel .admin-add-morfemo input { padding:4px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.8rem; width:100px; }
-    .admin-panel .admin-add-morfemo button { padding:4px 14px; border:none; background:var(--primary); color:#fff; border-radius:var(--radius-sm); cursor:pointer; font-size:0.8rem; }
+    /* 管理编辑:例句区无边框词素表格(按词序) */
+    .morfemoj-row.admin-table { display:flex; flex-direction:column; align-items:stretch; gap:2px; }
+    .admin-hint { font-size:0.72rem; color:var(--text-light); padding:2px 4px 6px; }
+    .admin-inline-row { display:flex; align-items:center; gap:6px; padding:3px 6px; border-radius:6px; flex-wrap:wrap; }
+    .admin-inline-row:nth-child(2n) { background:rgba(42,122,74,0.05); }
+    .admin-inline-row.target { outline:2px solid var(--accent); background:#fef6ed; }
+    .admin-inline-row.drag-over { box-shadow:inset 0 2px 0 var(--primary); }
+    .admin-inline-row .row-num { min-width:22px; text-align:right; color:var(--text-light); font-size:0.72rem; }
+    .admin-inline-row .drag-handle { cursor:grab; color:var(--text-light); font-weight:700; padding:0 4px; user-select:none; }
+    .admin-inline-row .drag-handle:active { cursor:grabbing; }
+    .admin-inline-row input { border:1px solid var(--border); border-radius:4px; font-size:0.8rem; padding:3px 6px; background:#fff; color:var(--text); }
+    .admin-inline-row .in-d, .admin-inline-row .in-b { width:90px; }
+    .admin-inline-row .in-n { width:52px; }
+    .admin-inline-row button { border:none; background:transparent; cursor:pointer; font-size:0.85rem; padding:2px 6px; border-radius:4px; color:var(--text-light); min-height:28px; }
+    .admin-inline-row button:hover { background:var(--bg); color:var(--primary); }
+    .admin-inline-row .del-btn { color:#c0392b; }
+    .admin-inline-row .del-btn:hover { background:#c0392b; color:#fff; }
 
     /* ===== 底部导航 ===== */
     .nav-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border); flex-wrap:wrap; }
@@ -172,22 +179,30 @@
     /* ===== 响应式 ===== */
     @media (max-width:600px) {
       #app { padding:16px 12px; }
-      .header { flex-direction:column; align-items:stretch; }
+      .header { flex-direction:column; align-items:stretch; gap:8px; }
+      .header .logo { margin-right:0; }
       .logo { font-size:1.6rem; justify-content:center; }
-      .mode-switch { justify-content:center; }
+      .mode-switch { justify-content:center; flex-wrap:wrap; }
+      .mode-btn { min-height:36px; padding:8px 14px; font-size:0.85rem; }
+      .user-info { justify-content:center; }
+      .about-btn { align-self:center; min-height:36px; }
       .settings { flex-direction:column; align-items:stretch; }
       .settings label { justify-content:space-between; }
+      .settings .btn-icon { min-height:40px; }
       .morfemoj-row { gap:8px 4px; }
-      .morfemo-item { min-width:24px; }
-      .morfemo-item .repl { font-size:1.2rem; min-height:1.8rem; }
+      .morfemo-item { min-width:30px; min-height:36px; padding:6px 4px; }
+      .morfemo-item .repl { font-size:1.25rem; min-height:2rem; line-height:1.1; }
       .morfemo-item .glyph { font-size:0.65rem; }
       .sentence-card { padding:16px 12px; }
       .editor-panel .editor-input-group { flex-direction:column; align-items:stretch; }
       .nav-footer { flex-direction:column; align-items:stretch; }
       .nav-footer .nav-buttons { justify-content:center; }
+      .nav-footer .nav-buttons button { min-height:40px; }
       .nav-footer .sentence-counter { text-align:center; }
       .admin-panel .admin-row { flex-direction:column; }
-      .admin-panel .admin-row button { width:100%; }
+      .admin-panel .admin-row button { width:100%; min-height:38px; }
+      .admin-inline-row .in-d, .admin-inline-row .in-b { width:72px; }
+      .admin-inline-row button { min-height:32px; }
     }
 
     /* ===== 词汇表 ===== */
@@ -280,6 +295,31 @@
     .contrib-badge { font-size:0.68rem; background:var(--accent); color:#fff; border-radius:10px; padding:1px 8px; }
     .glossary-sort-btn { font-size:0.72rem; padding:2px 10px; border-radius:10px; border:1px solid var(--border); background:var(--card); cursor:pointer; margin-left:6px; vertical-align:middle; }
     .glossary-sort-btn:hover { border-color:var(--primary); color:var(--primary); }
+
+    /* ===== 关于面板 ===== */
+    .about-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; justify-content:center; align-items:center; padding:24px 16px; }
+    .about-overlay.open { display:flex; }
+    .about-page { background:var(--card); border-radius:12px; max-width:560px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.3); }
+    .about-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
+    .about-header h3 { margin:0; font-size:1.05rem; }
+    .about-body { overflow-y:auto; padding:16px 18px; }
+    .about-intro { font-size:0.9rem; line-height:1.6; color:var(--text); margin:0 0 16px; }
+    .about-section { margin-bottom:14px; }
+    .about-section h4 { font-size:0.85rem; color:var(--primary); margin:0 0 6px; }
+    .about-link { color:var(--primary); text-decoration:none; font-family:monospace; font-size:0.85rem; word-break:break-all; }
+    .about-link:hover { text-decoration:underline; }
+    .about-section p { font-size:0.85rem; color:var(--text-light); margin:0; line-height:1.5; }
+    .about-footer { padding:12px 18px; border-top:1px solid var(--border); text-align:right; }
+
+    /* ===== 用户信息 ===== */
+    .user-info { display:flex; align-items:center; }
+    .user-badge { background:var(--primary-light); color:var(--primary-dark); padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; white-space:nowrap; }
+    .user-badge.admin { background:var(--accent); color:#fff; }
+    .about-btn { white-space:nowrap; }
+
+    /* ===== 头部布局优化 ===== */
+    .header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .header .logo { margin-right:auto; }
   </style>
 </head>
 
@@ -304,6 +344,32 @@
 </div>
 <input type="file" id="contribImportFile" accept=".json,application/json" style="display:none" />
 
+<!-- ===== 关于/项目介绍面板 ===== -->
+<div class="about-overlay" id="aboutOverlay">
+  <div class="about-page">
+    <div class="about-header">
+      <h3 data-i18n="about_title">Pri E-stacio</h3>
+      <button class="sidebar-close" id="aboutCloseBtn" title="Fermi">&times;</button>
+    </div>
+    <div class="about-body">
+      <p class="about-intro" id="aboutIntro"></p>
+      <div class="about-section">
+        <h4 data-i18n="about_repo">GitHub deponejo</h4>
+        <a href="https://github.com/MingeoY/E-stacio" target="_blank" rel="noopener noreferrer" class="about-link">
+          github.com/MingeoY/E-stacio
+        </a>
+      </div>
+      <div class="about-section">
+        <h4 data-i18n="about_lib">Fraza biblioteko</h4>
+        <p id="aboutLibInfo"></p>
+      </div>
+    </div>
+    <div class="about-footer">
+      <button class="btn-icon" id="aboutCloseBtn2" data-i18n="about_close">Fermi</button>
+    </div>
+  </div>
+</div>
+
 <div class="app-with-sidebar" id="app">
   <!-- ===== 抽屉式侧边栏 ===== -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
@@ -318,7 +384,7 @@
     </div>
     <!-- ===== 词汇表（移入抽屉） ===== -->
     <div class="glossary-grid-wrap" id="glossaryGridWrap">
-      <h3>Vortprovizo <button id="glossarySortBtn" class="glossary-sort-btn" title="Ordigo: laŭ b-alfabeta / laŭ hanzi-strokoj（按b字母序 / 按汉字笔画序）">↕ b</button></h3>
+      <h3><span data-i18n="glossary_title">Vortprovizo</span> <button id="glossarySortBtn" class="glossary-sort-btn" title="Ordigo: laŭ b-alfabeta / laŭ hanzi-strokoj（按b字母序 / 按汉字笔画序）">↕ b</button></h3>
       <div class="glossary-section-label" data-i18n="glossary_n0">n=0 — Fundamentaj finaĵoj</div>
       <div class="glossary-grid" id="glossaryGridN0"></div>
       <div class="glossary-section-label" data-i18n="glossary_npos">n>0 — Ordinaraj morfemoj</div>
@@ -342,6 +408,10 @@
         <button class="mode-btn" data-mode="user" data-i18n="mode_user">Ensaluti</button>
         <button class="mode-btn admin" data-mode="admin" data-i18n="mode_admin">Administri</button>
       </div>
+      <div class="user-info" id="userInfo" style="display:none;">
+        <span class="user-badge" id="userBadge"></span>
+      </div>
+      <button class="btn-icon about-btn" id="aboutBtn" data-i18n="about_btn">ℹ Pri</button>
     </header>
 
     <!-- ===== 设置栏 ===== -->
@@ -391,7 +461,7 @@
           </div>
         </div>
         <div class="suggestions" id="suggestionsWrap">
-          <span class="sug-label" data-i18n="suggest_label">Elekto de aliaj:</span>
+          <span class="sug-label" data-i18n="suggest_label">💡 Referencaj elektoj:</span>
           <span style="color:var(--text-light);font-size:0.8rem;" id="suggestionsEmpty" data-i18n="suggest_empty">neniu</span>
         </div>
         <div class="editor-other-examples" id="otherExamples" style="display:none;">
@@ -406,19 +476,11 @@
       <h4><span data-i18n="admin_title">Administra reĝimo — redakti morfemojn</span></h4>
       <div class="admin-row">
         <button class="btn-admin" id="adminEditToggle" data-i18n="admin_edit_toggle">Redakti morfemojn</button>
-        <button class="btn-admin-outline" id="adminExport" data-i18n="admin_export">Elporti JSON</button>
+        <button class="btn-admin-outline" id="adminExportCurrent" data-i18n="admin_export_current">Elporti frazon</button>
+        <button class="btn-admin-outline" id="adminExportSel" data-i18n="admin_export_sel">Elporti elekton</button>
         <button class="btn-admin-outline" id="adminImportBtn" data-i18n="admin_import">Enporti JSON</button>
         <input type="file" id="adminFileInput" accept=".json" style="display:none;" />
         <button class="btn-danger" id="adminResetData" data-i18n="admin_reset">Restarigi datumojn</button>
-      </div>
-      <div id="adminEditArea" style="display:none;">
-        <div class="morfemo-edit-list" id="adminMorfemoList"></div>
-        <div class="admin-add-morfemo">
-          <input type="text" id="adminNewD" placeholder="Montrata (d)" />
-          <input type="text" id="adminNewB" placeholder="Baza (b)" />
-          <input type="number" id="adminNewN" placeholder="n" value="0" style="width:60px;" />
-          <button id="adminAddBtn" data-i18n="admin_add">+ Aldoni</button>
-        </div>
       </div>
     </div>
 
@@ -442,7 +504,7 @@
 
 </div> <!-- /app -->
 
-<script src="e-stacio-data.js"></script>
+<script src="e-stacio-data.js?v=20261011f"></script>
 <script>
 // ============================================================
 // 数据验证 — e-stacio-data.js 提供 I18N, SENTENCES_RAW 等常量
@@ -463,6 +525,13 @@ if (typeof I18N === "undefined") {
 // ============================================================
 // 4. APP 状态
 // ============================================================
+// 系统管理员白名单:只有列表中的用户登录后才能进入管理模式
+// 未来可改为从社区基线或配置文件动态加载
+const ADMIN_USERS = ['Mingeo'];
+function isAdminUser(name) {
+  return !!name && ADMIN_USERS.indexOf(String(name)) >= 0;
+}
+
 const APP = {
   sentences: [],
   currentIndex: 0,
@@ -787,6 +856,11 @@ function loadState() {
     APP.mode = data.mode || 'guest';
     APP.currentIndex = data.currentIndex || 0;
     APP.currentUser = data.currentUser || null;
+    // 安全校验:若保存的是 admin 模式但当前用户不在白名单,回退为 guest
+    if (APP.mode === 'admin' && !isAdminUser(APP.currentUser)) {
+      APP.mode = 'guest';
+      APP.currentUser = null;
+    }
     mergeGlobalReplacements();
   } catch (_) {}
 }
@@ -837,7 +911,8 @@ function loadSentences() {
 // ============================================================
 // 侧边栏 + 词汇表
 // ============================================================
-function buildSentenceSelect() {
+// 重建侧边栏例句选项(不绑定监听器;导入后可安全重复调用)
+function rebuildSentenceOptions() {
   var sel = document.getElementById('sentenceSelect');
   sel.innerHTML = '';
   APP.sentences.forEach(function(s) {
@@ -847,6 +922,11 @@ function buildSentenceSelect() {
     opt.selected = true;
     sel.appendChild(opt);
   });
+}
+
+function buildSentenceSelect() {
+  rebuildSentenceOptions();
+  var sel = document.getElementById('sentenceSelect');
   sel.addEventListener('change', updateGlossary);
   document.getElementById('sidebarToggleAll').addEventListener('click', function() {
     var all = Array.from(sel.options).every(function(o) { return o.selected; });
@@ -887,7 +967,7 @@ function compareGlossary(a, b) {
   return a.b.localeCompare(b.b) || a.n - b.n;
 }
 
-// ===== 社区贡献页:直接查看其他玩家的全部贡献 =====
+// ===== 社区贡献页:直接查看社区的全部贡献数据 =====
 function openContribPage() {
   loadPublicRepl();          // 重新读取,获取其他用户的最新公开贡献
   mergeGlobalReplacements();
@@ -898,6 +978,23 @@ function openContribPage() {
 
 function closeContribPage() {
   document.getElementById('contribOverlay').classList.remove('open');
+}
+
+// ===== 关于/项目介绍面板 =====
+function openAboutPage() {
+  const intro = document.getElementById('aboutIntro');
+  const info = document.getElementById('aboutLibInfo');
+  if (intro) {
+    intro.textContent = I18N.about_intro[APP.lang] || I18N.about_intro.eo;
+  }
+  if (info) {
+    const tpl = I18N.about_lib_info[APP.lang] || I18N.about_lib_info.eo;
+    info.textContent = tpl.replace('{n}', APP.sentences.length);
+  }
+  document.getElementById('aboutOverlay').classList.add('open');
+}
+function closeAboutPage() {
+  document.getElementById('aboutOverlay').classList.remove('open');
 }
 
 function renderContribPage() {
@@ -1081,6 +1178,14 @@ function renderSentence() {
   row.innerHTML = '';
   const sId = sentence.id;
 
+  // 管理编辑模式:例句区直接呈现无边框词素表格(按词序,编辑底层 morfemoj 结构)
+  if (APP.mode === 'admin' && APP.adminEditing) {
+    row.classList.add('admin-table');
+    renderAdminInlineTable(sentence, row);
+    return;
+  }
+  row.classList.remove('admin-table');
+
   // 使用 expandiMorfemoj 获取展开后的词素列表
   const expanded = expandiMorfemoj(sentence.morfemoj, APP.mergeMode);
 
@@ -1161,65 +1266,148 @@ function renderSettings() {
 function renderAdminPanel() {
   const panel = document.getElementById('adminPanel');
   panel.classList.toggle('open', APP.mode === 'admin');
-  if (APP.mode === 'admin') {
-    const sentence = getCurrentSentence();
-    if (sentence) renderAdminMorfemoList(sentence);
-    document.getElementById('adminEditArea').style.display = APP.adminEditing ? 'block' : 'none';
-  }
 }
 
-function renderAdminMorfemoList(sentence) {
-  const list = document.getElementById('adminMorfemoList');
-  list.innerHTML = '';
+// ===== 管理编辑:例句区无边框词素表格(按词序) =====
+let adminDragIdx = null;
+
+function escAttr(v) {
+  return String(v === undefined || v === null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function renderAdminInlineTable(sentence, row) {
+  const hint = document.createElement('div');
+  hint.className = 'admin-hint';
+  hint.setAttribute('data-i18n', 'admin_edit_hint');
+  row.appendChild(hint);
+
   sentence.morfemoj.forEach((m, idx) => {
     const div = document.createElement('div');
-    div.className = 'morfemo-edit-item';
+    div.className = 'admin-inline-row';
+    div.dataset.idx = idx;
     const isTarget = APP.adminEditTarget && APP.adminEditTarget.sentenceId === sentence.id && APP.adminEditTarget.morfemoIndex === idx;
-    if (isTarget) { div.style.border = '2px solid var(--accent)'; div.style.background = '#fef6ed'; }
-    div.innerHTML = `
-      <span>${idx}</span>
-      <input class="display-input" type="text" value="${m.d}" data-field="d" data-idx="${idx}" />
-      <input class="base-input" type="text" value="${m.b}" data-field="b" data-idx="${idx}" />
-      <input class="number-input" type="number" value="${m.n}" data-field="n" data-idx="${idx}" />
-      <button class="del-btn" data-idx="${idx}">✕</button>
-      <button style="border:none;background:var(--primary);color:#fff;border-radius:4px;padding:0 8px;cursor:pointer;font-size:0.7rem;" data-idx="${idx}" data-edit="select">Redakti</button>
-    `;
-    list.appendChild(div);
+    if (isTarget) div.classList.add('target');
 
+    div.innerHTML = `
+      <span class="row-num">${idx + 1}</span>
+      <span class="drag-handle" draggable="true" title="Traber">&#9776;</span>
+      <input class="in-d" type="text" value="${escAttr(m.d)}" data-field="d" placeholder="Montrata (d)" />
+      <input class="in-b" type="text" value="${escAttr(m.b)}" data-field="b" placeholder="Baza (b)" />
+      <input class="in-n" type="number" value="${m.n}" data-field="n" />
+      <button class="ins-btn" title="Enmeti morfemon antaŭ">&#65291;</button>
+      <button class="up-btn" title="Suprenigi">&#8593;</button>
+      <button class="down-btn" title="Malsuprenigi">&#8595;</button>
+      <button class="del-btn" title="Forigi">&#10005;</button>
+    `;
+    row.appendChild(div);
+
+    // 编辑 d/b/n 字段(变更即保存)
     div.querySelectorAll('input').forEach(inp => {
       inp.addEventListener('change', (e) => {
-        const idx2 = parseInt(e.target.dataset.idx);
+        const i = parseInt(div.dataset.idx);
         const field = e.target.dataset.field;
         let val = e.target.value;
         if (field === 'n') val = parseInt(val) || 0;
         const s = getCurrentSentence();
-        if (s && s.morfemoj[idx2]) {
-          s.morfemoj[idx2][field] = val;
+        if (s && s.morfemoj[i]) {
+          s.morfemoj[i][field] = val;
           saveSentences();
           renderAll();
         }
       });
     });
 
-    div.querySelector('.del-btn').addEventListener('click', (e) => {
-      const idx2 = parseInt(e.target.dataset.idx);
-      const s = getCurrentSentence();
-      if (s && s.morfemoj.length > 1) {
-        s.morfemoj.splice(idx2, 1);
-        saveSentences();
-        renderAll();
-        showToast('Morfemo forigita', 'success');
-      } else {
-        showToast('Ne eblas forigi la lastan morfemon', 'error');
-      }
+    // 在该行前插入新词素
+    div.querySelector('.ins-btn').addEventListener('click', () => {
+      insertMorfemoAt(sentence.id, parseInt(div.dataset.idx));
     });
 
-    div.querySelector('[data-edit="select"]').addEventListener('click', (e) => {
-      const idx2 = parseInt(e.target.dataset.idx);
-      APP.adminEditTarget = { sentenceId: sentence.id, morfemoIndex: idx2 };
+    // 上下移动(触屏/无拖拽环境的可靠替代)
+    div.querySelector('.up-btn').addEventListener('click', () => {
+      const i = parseInt(div.dataset.idx);
+      moveMorfemo(sentence.id, i, i - 1);
+    });
+    div.querySelector('.down-btn').addEventListener('click', () => {
+      const i = parseInt(div.dataset.idx);
+      moveMorfemo(sentence.id, i, i + 1);
+    });
+
+    // 删除
+    div.querySelector('.del-btn').addEventListener('click', () => {
+      deleteMorfemoAt(sentence.id, parseInt(div.dataset.idx));
+    });
+
+    // 点击行空白处:选中为编辑目标(高亮)
+    div.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.classList.contains('drag-handle')) return;
+      APP.adminEditTarget = { sentenceId: sentence.id, morfemoIndex: parseInt(div.dataset.idx) };
       renderAll();
     });
+
+    // 拖拽排序(手柄触发,避免与输入框冲突)
+    const handle = div.querySelector('.drag-handle');
+    handle.addEventListener('dragstart', (e) => {
+      adminDragIdx = parseInt(div.dataset.idx);
+      e.dataTransfer.effectAllowed = 'move';
+      try { e.dataTransfer.setData('text/plain', String(adminDragIdx)); } catch (_) {}
+    });
+    handle.addEventListener('dragend', () => { adminDragIdx = null; });
+    div.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      div.classList.add('drag-over');
+    });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', (e) => {
+      e.preventDefault();
+      div.classList.remove('drag-over');
+      const from = adminDragIdx !== null ? adminDragIdx : parseInt(e.dataTransfer.getData('text/plain'));
+      if (!isNaN(from)) moveMorfemo(sentence.id, from, parseInt(div.dataset.idx));
+      adminDragIdx = null;
+    });
   });
+}
+
+// 调整词素顺序:把 from 位置的词素移到 to 位置(同步修正编辑目标索引)
+function moveMorfemo(sId, from, to) {
+  const s = APP.sentences.find(x => x.id === sId);
+  if (!s) return;
+  const len = s.morfemoj.length;
+  if (from < 0 || from >= len) return;
+  to = Math.max(0, Math.min(len - 1, to));
+  if (from === to) return;
+  const [m] = s.morfemoj.splice(from, 1);
+  s.morfemoj.splice(to, 0, m);
+  if (APP.adminEditTarget && APP.adminEditTarget.sentenceId === sId) {
+    const t = APP.adminEditTarget.morfemoIndex;
+    if (t === from) APP.adminEditTarget.morfemoIndex = to;
+    else if (from < to && t > from && t <= to) APP.adminEditTarget.morfemoIndex--;
+    else if (from > to && t >= to && t < from) APP.adminEditTarget.morfemoIndex++;
+  }
+  saveSentences();
+  renderAll();
+}
+
+// 在 idx 位置插入空词素并聚焦其 d 输入框
+function insertMorfemoAt(sId, idx) {
+  const s = APP.sentences.find(x => x.id === sId);
+  if (!s) return;
+  s.morfemoj.splice(idx, 0, { d: '', b: '', n: 0 });
+  saveSentences();
+  renderAll();
+  const inp = document.querySelector('#morfemojRow .admin-inline-row[data-idx="' + idx + '"] .in-d');
+  if (inp) inp.focus();
+}
+
+function deleteMorfemoAt(sId, idx) {
+  const s = APP.sentences.find(x => x.id === sId);
+  if (!s) return;
+  if (s.morfemoj.length <= 1) { showToast('Ne eblas forigi la lastan morfemon', 'error'); return; }
+  s.morfemoj.splice(idx, 1);
+  saveSentences();
+  renderAll();
+  showToast('Morfemo forigita', 'success');
 }
 
 function renderEditor() {
@@ -1240,16 +1428,16 @@ function renderEditor() {
         document.getElementById('editorInput').value = currentRepl;
         document.getElementById('editorInput').focus();
 
-        // 候选建议:实时贡献(精确 b|n 键)优先,n=0 词尾默认种子 COMMUNITY_DATA 补充
-        // 种子键:合并模式取整体词尾(如 ojn),拆分模式取拆分字符(如 o/j/n)
+        // 候选建议:实时贡献(精确 b|n 键)优先,n=0 词尾默认种子补充
+        // 种子仅合并模式有(COMMUNITY_DATA,整体词尾);拆分模式不设任何默认字,
+        // 只显示用户在拆分模式下明确指定的替换所产生的实时贡献
         const wrap = document.getElementById('suggestionsWrap');
-        wrap.innerHTML = '<span class="sug-label" data-i18n="suggest_label">Elekto de aliaj:</span>';
+        wrap.innerHTML = '<span class="sug-label" data-i18n="suggest_label">💡 Referencaj elektoj:</span>';
         const gkey = computeGlobalKey(m, subIdx);
         const live = APP.publicContrib[gkey] || {};
-        const seedKey = (m.n === 0 && !APP.mergeMode && m.b.length > 1 && subIdx !== undefined && subIdx !== null)
-          ? (m.b.split('')[subIdx] || '').toLowerCase()
-          : m.b.toLowerCase();
-        const seed = COMMUNITY_DATA[seedKey] || {};
+        const seed = (m.n === 0 && APP.mergeMode)
+          ? (COMMUNITY_DATA[m.b.toLowerCase()] || {})
+          : {};
         const seenChars = new Set();
         const items = [];
         Object.entries(live).sort((a, b) => b[1].c - a[1].c).forEach(([char, info]) => {
@@ -1338,7 +1526,27 @@ function updateNavButtons() {
 function updateModeButtons() {
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === APP.mode);
+    // 管理按钮仅对已登录的管理员可见
+    if (btn.dataset.mode === 'admin') {
+      const canAdmin = (APP.mode === 'user' || APP.mode === 'admin') && isAdminUser(APP.currentUser);
+      btn.style.display = canAdmin ? '' : 'none';
+    }
   });
+
+  // 用户信息显示:登录(user)或管理(admin)模式下显示用户名;管理模式高亮
+  const userInfo = document.getElementById('userInfo');
+  const userBadge = document.getElementById('userBadge');
+  if (userInfo && userBadge) {
+    if ((APP.mode === 'user' || APP.mode === 'admin') && APP.currentUser) {
+      userInfo.style.display = 'flex';
+      userBadge.textContent = APP.currentUser + (APP.mode === 'admin' ? ' ⚙' : '');
+      userBadge.classList.toggle('admin', APP.mode === 'admin');
+    } else {
+      userInfo.style.display = 'none';
+      userBadge.textContent = '';
+      userBadge.classList.remove('admin');
+    }
+  }
 
   renderAdminPanel();
 }
@@ -1456,7 +1664,15 @@ function setMode(mode) {
   loadPublicRepl();
 
   if (mode === 'admin') {
-    if (!confirm('Ĉu vi volas eniri administran reĝimon?')) return;
+    // 权限控制:只有白名单用户(登录状态下)才能进入管理模式
+    if (!APP.currentUser) {
+      showToast(I18N.login_first[APP.lang] || I18N.login_first.eo, 'error');
+      return;
+    }
+    if (!isAdminUser(APP.currentUser)) {
+      showToast(I18N.admin_forbidden[APP.lang] || I18N.admin_forbidden.eo, 'error');
+      return;
+    }
     APP.adminEditing = false; APP.adminEditTarget = null;
     // 管理模式沿用当前用户数据,无需重载
   } else if (mode === 'user') {
@@ -1490,31 +1706,85 @@ function setMode(mode) {
 // ============================================================
 // 13. 导入/导出 / 重置
 // ============================================================
-function exportData() {
-  const data = { version:'1.1', exportedAt:new Date().toISOString(), sentences:APP.sentences, replacements:APP.replacements, publicContrib:APP.publicContrib };
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+function downloadJSON(obj, filename) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'e-stacio-data.json'; a.click();
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
-  showToast('Datumoj elportitaj', 'success');
 }
 
-function importData(file) {
+// 句包导出:单句或多句(例句结构 + 所导出句子的逐位置替换)
+function exportSentences(ids) {
+  const list = APP.sentences.filter(s => ids.indexOf(s.id) >= 0);
+  if (!list.length) { showToast('Neniu frazo por elporti', 'error'); return; }
+  // 只附带走所导出句子的 replacements(键格式 sId-origIdx[-subIdx])
+  const idSet = new Set(list.map(s => s.id));
+  const repl = {};
+  Object.entries(APP.replacements).forEach(([k, v]) => {
+    if (idSet.has(parseInt(k, 10))) repl[k] = v;
+  });
+  const data = { version:'1.2', type:'sentences', exportedAt:new Date().toISOString(), sentences:list, replacements:repl };
+  const name = list.length === 1
+    ? 'e-stacio-frazo-' + (list[0].id + 1) + '.json'
+    : 'e-stacio-frazoj-' + list.length + '.json';
+  downloadJSON(data, name);
+  showToast('Elportitaj ' + list.length + ' frazoj', 'success');
+}
+
+function exportCurrentSentence() {
+  const s = getCurrentSentence();
+  if (s) exportSentences([s.id]);
+}
+
+// 导出侧边栏所选例句;未做特定选择(全选)时导出全部
+function exportSelectedSentences() {
+  const ids = getSelectedIds();
+  exportSentences(ids || APP.sentences.map(s => s.id));
+}
+
+// 全量导入(旧式备份文件:含 publicContrib 或 type='full')
+function applyFullImport(data) {
+  if (data.sentences && Array.isArray(data.sentences)) {
+    APP.sentences = data.sentences;
+    if (data.replacements) APP.replacements = data.replacements;
+    // 合并社区贡献数据(按用户名去重,保留最新时间戳)
+    if (data.publicContrib && typeof data.publicContrib === 'object') {
+      mergeContribIntoLocal(data.publicContrib);
+    }
+    saveSentences(); saveState();
+    APP.currentIndex = 0; closeEditor();
+    rebuildSentenceOptions();
+    renderAll();
+    showToast('Enporto sukcesa! ' + APP.sentences.length + ' frazoj', 'success');
+  } else { showToast('Nevalida formato', 'error'); }
+}
+
+// 句包导入:例句按 id 合并(同 id 整句替换,新 id 追加);
+// 附带的 replacements 按键合并,不影响其他句子的替换;旧式全量备份自动识别
+function importSentencesFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      if (data.sentences && Array.isArray(data.sentences)) {
-        APP.sentences = data.sentences;
-        if (data.replacements) APP.replacements = data.replacements;
-        // 合并社区贡献数据(按用户名去重,保留最新时间戳)
-        if (data.publicContrib && typeof data.publicContrib === 'object') {
-          mergeContribIntoLocal(data.publicContrib);
-        }
-        saveSentences(); saveState();
-        APP.currentIndex = 0; closeEditor(); renderAll();
-        showToast('Enporto sukcesa! ' + APP.sentences.length + ' frazoj', 'success');
-      } else { showToast('Nevalida formato', 'error'); }
+      if (data.type === 'full' || data.publicContrib) { applyFullImport(data); return; }
+      const list = Array.isArray(data) ? data : (Array.isArray(data.sentences) ? data.sentences : null);
+      const valid = list && list.length > 0 && list.every(s => s && typeof s.id === 'number' && Array.isArray(s.morfemoj) && s.translations);
+      if (!valid) { showToast('Nevalida formato', 'error'); return; }
+      let replaced = 0, added = 0;
+      list.forEach(pack => {
+        const i = APP.sentences.findIndex(s => s.id === pack.id);
+        if (i >= 0) { APP.sentences[i] = pack; replaced++; }
+        else { APP.sentences.push(pack); added++; }
+      });
+      APP.sentences.sort((a, b) => a.id - b.id);
+      if (data.replacements && typeof data.replacements === 'object') {
+        Object.assign(APP.replacements, data.replacements);
+      }
+      saveSentences(); saveState();
+      if (APP.mode === 'user' && APP.currentUser) saveUserData();
+      rebuildSentenceOptions();
+      renderAll();
+      showToast('Enportitaj frazoj: ' + replaced + ' anstataŭigitaj · ' + added + ' novaj', 'success');
     } catch(err) { showToast('Eraro: ' + err.message, 'error'); }
   };
   reader.readAsText(file);
@@ -1604,6 +1874,13 @@ function init() {
   // 社区贡献页
   document.getElementById('contribBtn').addEventListener('click', openContribPage);
   document.getElementById('contribCloseBtn').addEventListener('click', closeContribPage);
+  // 关于面板
+  document.getElementById('aboutBtn').addEventListener('click', openAboutPage);
+  document.getElementById('aboutCloseBtn').addEventListener('click', closeAboutPage);
+  document.getElementById('aboutCloseBtn2').addEventListener('click', closeAboutPage);
+  document.getElementById('aboutOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'aboutOverlay') closeAboutPage();
+  });
   document.getElementById('contribImportBtn').addEventListener('click', () => document.getElementById('contribImportFile').click());
   document.getElementById('contribImportFile').addEventListener('change', (e) => {
     if (e.target.files.length > 0) importContribFile(e.target.files[0]);
@@ -1667,29 +1944,14 @@ function init() {
     else { APP.adminEditTarget = null; showToast('Redakta reĝimo malaktiva', 'success'); }
     renderAll();
   });
-  document.getElementById('adminExport').addEventListener('click', exportData);
+  document.getElementById('adminExportCurrent').addEventListener('click', exportCurrentSentence);
+  document.getElementById('adminExportSel').addEventListener('click', exportSelectedSentences);
   document.getElementById('adminImportBtn').addEventListener('click', () => document.getElementById('adminFileInput').click());
   document.getElementById('adminFileInput').addEventListener('change', (e) => {
-    if (e.target.files.length > 0) { importData(e.target.files[0]); }
+    if (e.target.files.length > 0) { importSentencesFile(e.target.files[0]); }
     e.target.value = '';
   });
   document.getElementById('adminResetData').addEventListener('click', resetData);
-  document.getElementById('adminAddBtn').addEventListener('click', () => {
-    const d = document.getElementById('adminNewD').value.trim();
-    const b = document.getElementById('adminNewB').value.trim();
-    const n = parseInt(document.getElementById('adminNewN').value) || 0;
-    if (!d || !b) { showToast('Plenigu montrata kaj baza formoj', 'error'); return; }
-    const s = getCurrentSentence();
-    if (s) {
-      s.morfemoj.push({ d, b, n });
-      saveSentences();
-      renderAll();
-      document.getElementById('adminNewD').value = '';
-      document.getElementById('adminNewB').value = '';
-      document.getElementById('adminNewN').value = '0';
-      showToast('Morfemo aldonita', 'success');
-    }
-  });
 
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;

@@ -22,19 +22,19 @@ const I18N = {
   btn_next: { eo:'▶ Posta', zh:'下一句', ja:'次へ', en:'Next' },
   editor_title: { eo:'✏️ Anstataŭigi morfemon', zh:'替换词素', ja:'形態素置換', en:'Replace morpheme' },
   editor_hint: { eo:'Enigu ĉinan signon', zh:'输入汉字', ja:'漢字を入力', en:'Enter Chinese character' },
-  suggest_label: { eo:'💡 Elekto de aliaj:', zh:'其他玩家选择:', ja:'他のプレイヤーの選択:', en:'Other players:' },
+  suggest_label: { eo:'💡 Referencaj elektoj:', zh:'参考选择:', ja:'参考の選択:', en:'For reference:' },
   suggest_empty: { eo:'neniu', zh:'无', ja:'なし', en:'none' },
   translation_label: { eo:'Traduko', zh:'翻译', ja:'翻訳', en:'Translation' },
   admin_title: { eo:'Administra reĝimo — redakti morfemojn', zh:'管理模式 — 编辑词素', ja:'管理モード — 形態素編集', en:'Admin mode — edit morphemes' },
   admin_edit_toggle: { eo:'✎ Redakti morfemojn', zh:'编辑词素', ja:'形態素編集', en:'Edit morphemes' },
-  admin_export: { eo:'📤 Elporti JSON', zh:'导出 JSON', ja:'JSON出力', en:'Export JSON' },
   admin_import: { eo:'📥 Enporti JSON', zh:'导入 JSON', ja:'JSON入力', en:'Import JSON' },
   admin_reset: { eo:'⚠ Restarigi datumojn', zh:'重置数据', ja:'データリセット', en:'Reset data' },
-  admin_add: { eo:'+ Aldoni', zh:'添加', ja:'追加', en:'Add' },
+  admin_export_current: { eo:'📤 Elporti frazon', zh:'导出本句', ja:'この文を出力', en:'Export sentence' },
+  admin_export_sel: { eo:'📤 Elporti elekton', zh:'导出所选', ja:'選択を出力', en:'Export selection' },
+  admin_edit_hint: { eo:'Ŝovu ≡ por reordigi · + enmetas novan morfemon antaŭ la vico · ↑↓ ankaŭ reordigas', zh:'拖动 ≡ 调整词序 · ＋ 在该行前插入新词素 · ↑↓ 亦可调整顺序', ja:'≡ をドラッグで並べ替え · ＋ でこの行の前に挿入 · ↑↓ でも並べ替え可能', en:'Drag ≡ to reorder · + inserts a morpheme before the row · ↑↓ also reorder' },
   copy_a: { eo:'📋 Anstataŭigi', zh:'汉字替换', ja:'漢字置換', en:'Replace' },
   copy_b: { eo:'📋 Parentezi', zh:'括号标注', ja:'括弧注釈', en:'Parenthesize' },
   other_examples_title: { eo:'Samaj morfemoj en aliaj frazoj:', zh:'相同词素在其他句子中:', ja:'同じ形態素の他の例文:', en:'Same morphemes in other sentences:' },
-  mode_glossary: { eo:'📖 Vortprovizo', zh:'词汇表', ja:'語彙表', en:'Glossary' },
   glossary_title: { eo:'Vortprovizo', zh:'词汇表', ja:'語彙表', en:'Glossary' },
   glossary_sort_b: { eo:'Baza ordo', zh:'字母排序', ja:'アルファベット順', en:'Alphabetical' },
   glossary_sort_strokes: { eo:'Signa ordo', zh:'汉字笔画', ja:'画数順', en:'Stroke order' },
@@ -49,6 +49,16 @@ const I18N = {
   contrib_effective: { eo:'efektiva', zh:'生效中', ja:'有効', en:'effective' },
   contrib_import: { eo:'Importi pakon', zh:'导入贡献包', ja:'貢献を取り込む', en:'Import package' },
   contrib_export: { eo:'Elporti bazlinion', zh:'导出基线', ja:'基線を書き出す', en:'Export baseline' },
+  about_btn: { eo:'ℹ Pri', zh:'关于', ja:'について', en:'About' },
+  about_title: { eo:'Pri E-stacio', zh:'关于世语驿站', ja:'世語駅について', en:'About E-stacio' },
+  about_intro: { eo:'Morfema ĉina anstataŭiga lernilo por Esperanto. Ĉiu morfemo (b|n) povas esti anstataŭita de ĉina signo; sama morfemo estas sinkronigita tra ĉiuj frazoj.', zh:'世界语词素级汉字替换学习工具。每个词素(b|n)可替换为汉字;相同词素在所有句子中同步替换。', ja:'エスペラントの形態素レベル漢字置換学習ツール。各形態素(b|n)を漢字に置換可能;同じ形態素は全例文で同期されます。', en:'Morpheme-level Chinese replacement learning tool for Esperanto. Each morpheme (b|n) can be replaced by a Chinese character; the same morpheme is synchronized across all sentences.' },
+  about_repo: { eo:'GitHub deponejo', zh:'GitHub 仓库', ja:'GitHub リポジトリ', en:'GitHub repository' },
+  about_lib: { eo:'Fraza biblioteko', zh:'例句库', ja:'例文ライブラリ', en:'Sentence library' },
+  about_lib_info: { eo:'Nun estas ŝargitaj {n} frazoj (el Duolingo Guidebook kaj duome.eu).', zh:'当前已加载 {n} 句(来自多邻国 Guidebook 与 duome.eu)。', ja:'現在 {n} 文をロード中(Duolingo Guidebook と duome.eu より)。', en:'{n} sentences loaded (from Duolingo Guidebook and duome.eu).' },
+  about_close: { eo:'Fermi', zh:'关闭', ja:'閉じる', en:'Close' },
+  user_label: { eo:'Uzanto', zh:'用户', ja:'ユーザー', en:'User' },
+  admin_forbidden: { eo:'Nur administranto povas eniri administran reĝimon', zh:'只有管理员可以进入管理模式', ja:'管理者のみ管理モードに入れます', en:'Only an administrator can enter admin mode' },
+  login_first: { eo:'Bonvolu unue ensaluti', zh:'请先登录', ja:'先にログインしてください', en:'Please sign in first' },
 };
 
 let currentLang = 'zh';
@@ -900,7 +910,7 @@ const SENTENCES_RAW = [
 ];
 
 // ============================================================
-// 3. n=0 特殊词尾默认汉字种子(合并模式 15 词尾;拆分模式下按拆分字符 a/e/o/u/n 取用)
+// 3. n=0 特殊词尾默认汉字种子(仅合并模式 15 词尾)
 // 仅作为编辑器建议展示,不自动应用
 // ============================================================
 const COMMUNITY_DATA = {

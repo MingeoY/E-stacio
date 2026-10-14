@@ -28,7 +28,7 @@
     #app { max-width:1600px; width:100%; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px 24px 32px; }
 
     /* ===== 头部 ===== */
-    .header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px 16px; margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:14px; }
+    .header { position:sticky; top:0; z-index:50; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px 16px; margin-bottom:16px; border-bottom:2px solid var(--border); padding:10px 0 14px; background:var(--card); }
     .logo { font-size:2rem; font-weight:700; color:var(--primary-dark); display:flex; align-items:baseline; gap:2px; }
     .logo .staci-ruby { display:inline-flex; flex-direction:column; align-items:center; font-size:2rem; line-height:1.2; }
     .logo .staci-ruby rt { font-size:0.7rem; font-weight:400; color:var(--primary-light); letter-spacing:0.5px; }
@@ -179,13 +179,14 @@
     /* ===== 响应式 ===== */
     @media (max-width:600px) {
       #app { padding:16px 12px; }
-      .header { flex-direction:column; align-items:stretch; gap:8px; }
       .header .logo { margin-right:0; }
       .logo { font-size:1.6rem; justify-content:center; }
+      .settings-bar { flex-direction:column; align-items:stretch; gap:10px; }
+      .settings-bar .logo { margin-right:0; }
+      .settings-bar label { justify-content:space-between; }
       .mode-switch { justify-content:center; flex-wrap:wrap; }
       .mode-btn { min-height:36px; padding:8px 14px; font-size:0.85rem; }
       .user-info { justify-content:center; }
-      .about-btn { align-self:center; min-height:36px; }
       .settings { flex-direction:column; align-items:stretch; }
       .settings label { justify-content:space-between; }
       .settings .btn-icon { min-height:40px; }
@@ -227,28 +228,25 @@
     .glossary-comm-item .char { font-weight:500; }
     .glossary-comm-item .count { color:var(--text-light); font-size:0.7rem; }
 
-    /* ===== 抽屉式侧边栏 ===== */
+    /* ===== 通用关闭按钮(导入选择器弹窗复用) ===== */
     .app-with-sidebar { display:block; }
-    .sidebar {
-      position: fixed; top:0; left:0;
-      width: 340px; max-width: 85vw; height: 100vh;
-      background: var(--card); box-shadow: 4px 0 24px rgba(0,0,0,0.15);
-      z-index: 1100; padding: 16px 16px 24px;
-      transform: translateX(-100%); transition: transform 0.25s ease;
-      overflow-y: auto; border-radius: 0; border: none; font-size: 0.8rem;
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .sidebar.open { transform: translateX(0); }
-    .sidebar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
-    .sidebar-header h3 { font-size:0.95rem; color:var(--primary); margin:0; }
     .sidebar-close { border:none; background:transparent; font-size:1.4rem; line-height:1; color:var(--text-light); cursor:pointer; padding:0 4px; }
     .sidebar-close:hover { color:var(--primary); }
-    .sidebar h4 { font-size:0.85rem; color:var(--primary); margin:0 0 8px; display:flex; justify-content:space-between; align-items:center; }
-    .sidebar select { width:100%; height:260px; font-size:0.75rem; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--card); color:var(--text); }
-    .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:1099; opacity:0; pointer-events:none; transition:opacity 0.25s ease; }
-    .drawer-overlay.open { opacity:1; pointer-events:auto; }
+
     .main-content { width:100%; }
-    @media(max-width:600px) { .sidebar { width:100%; max-width:100%; } }
+
+    /* ===== 可折叠区块(summary 为折叠开关,三个主区域通用) ===== */
+    details.fold { margin-top:6px; }
+    details.fold + details.fold, details.fold + .fold-gap { margin-top:18px; }
+    details.fold > summary { list-style:none; cursor:pointer; user-select:none; display:flex; align-items:center; gap:8px; font-size:1.02rem; font-weight:700; color:var(--primary); padding:6px 2px; border-radius:var(--radius-sm); }
+    details.fold > summary::-webkit-details-marker { display:none; }
+    details.fold > summary::before { content:'▸'; display:inline-block; font-size:0.85em; transition:transform .18s ease; }
+    details.fold[open] > summary::before { transform:rotate(90deg); }
+    details.fold > summary:hover { color:var(--primary-dark); }
+    details.fold > summary .fold-hint { font-size:0.7rem; font-weight:400; color:var(--text-light); margin-left:2px; }
+    /* 词汇表卡:details 本身作为卡片容器 */
+    details.fold.home-card > summary { padding:0 0 10px; }
+    details.fold.home-card[open] > summary { padding-bottom:12px; }
 
     /* ===== 词汇表网格 ===== */
     .glossary-grid-wrap { margin-top:0; padding-top:0; border-top:none; }
@@ -274,16 +272,14 @@
     .glossary-popup .popup-sent .sid { font-weight:500; color:var(--primary); margin-right:6px; }
     .glossary-popup .popup-sent .stext { color:var(--text); }
     .glossary-popup .popup-sent .strans { font-size:0.75rem; color:var(--text-light); margin-top:2px; }
-    /* ===== 社区贡献页 ===== */
-    .contrib-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; justify-content:center; align-items:center; padding:24px 16px; }
-    .contrib-overlay.open { display:flex; }
-    .contrib-page { background:var(--card); border-radius:12px; max-width:640px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.3); }
-    .contrib-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
+    /* ===== 社区贡献页（内嵌页面） ===== */
+    .contrib-page { width:100%; display:flex; flex-direction:column; }
+    .contrib-header { display:flex; justify-content:space-between; align-items:center; padding:0 0 10px; border-bottom:1px solid var(--border); }
     .contrib-header h3 { margin:0; font-size:1.05rem; }
-    .contrib-actions { display:flex; gap:6px; align-items:center; }
+    .contrib-actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
     .contrib-actions .glossary-sort-btn { margin-left:0; }
-    .contrib-stats { padding:8px 18px; font-size:0.8rem; color:var(--text-light); border-bottom:1px dashed var(--border); }
-    .contrib-list { overflow-y:auto; padding:10px 18px 18px; }
+    .contrib-stats { padding:8px 0; font-size:0.8rem; color:var(--text-light); border-bottom:1px dashed var(--border); }
+    .contrib-list { padding:10px 0 18px; }
     .contrib-empty { color:var(--text-light); font-size:0.85rem; padding:18px 0; text-align:center; }
     .contrib-group { margin-bottom:14px; }
     .contrib-key { font-family:monospace; font-size:0.78rem; color:var(--primary); font-weight:600; padding:4px 0; border-bottom:1px solid var(--border); }
@@ -296,30 +292,105 @@
     .glossary-sort-btn { font-size:0.72rem; padding:2px 10px; border-radius:10px; border:1px solid var(--border); background:var(--card); cursor:pointer; margin-left:6px; vertical-align:middle; }
     .glossary-sort-btn:hover { border-color:var(--primary); color:var(--primary); }
 
-    /* ===== 关于面板 ===== */
-    .about-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1100; justify-content:center; align-items:center; padding:24px 16px; }
-    .about-overlay.open { display:flex; }
-    .about-page { background:var(--card); border-radius:12px; max-width:560px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.3); }
-    .about-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
-    .about-header h3 { margin:0; font-size:1.05rem; }
-    .about-body { overflow-y:auto; padding:16px 18px; }
+    /* ===== 关于页（内嵌页面） ===== */
+    .about-embed { width:100%; }
     .about-intro { font-size:0.9rem; line-height:1.6; color:var(--text); margin:0 0 16px; }
     .about-section { margin-bottom:14px; }
     .about-section h4 { font-size:0.85rem; color:var(--primary); margin:0 0 6px; }
     .about-link { color:var(--primary); text-decoration:none; font-family:monospace; font-size:0.85rem; word-break:break-all; }
     .about-link:hover { text-decoration:underline; }
     .about-section p { font-size:0.85rem; color:var(--text-light); margin:0; line-height:1.5; }
-    .about-footer { padding:12px 18px; border-top:1px solid var(--border); text-align:right; }
+    .about-text { white-space:pre-line; }
 
     /* ===== 用户信息 ===== */
     .user-info { display:flex; align-items:center; }
     .user-badge { background:var(--primary-light); color:var(--primary-dark); padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; white-space:nowrap; }
     .user-badge.admin { background:var(--accent); color:#fff; }
-    .about-btn { white-space:nowrap; }
 
-    /* ===== 头部布局优化 ===== */
-    .header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-    .header .logo { margin-right:auto; }
+    /* ===== 头部布局:上行全局设置条(logo/登录/语种/合并拆分/用户),下行功能区导航 ===== */
+    .header { display:flex; flex-direction:column; align-items:stretch; gap:10px; }
+    .settings-bar { display:flex; align-items:center; gap:10px 18px; flex-wrap:wrap; }
+    .settings-bar .logo { margin-right:auto; }
+    .settings-bar label { display:flex; align-items:center; gap:6px; font-size:0.85rem; font-weight:500; color:var(--text-light); }
+    .settings-bar select { padding:4px 8px; border-radius:var(--radius-sm); border:1px solid var(--border); background:#fff; font-size:0.85rem; color:var(--text); cursor:pointer; }
+    .settings-bar .toggle-group { display:flex; gap:0; border-radius:30px; overflow:hidden; border:1px solid var(--border); }
+    .settings-bar .toggle-group button { border:none; background:#fff; padding:4px 14px; font-size:0.8rem; cursor:pointer; transition:var(--transition); color:var(--text-light); }
+    .settings-bar .toggle-group button.active { background:var(--primary); color:#fff; }
+    .settings-bar .toggle-group button:first-child { border-right:1px solid var(--border); }
+
+    /* ===== 单页布局:左上关于 / 右上例句面板(与左等高) / 例句卡片区 / 下方社区贡献词表 ===== */
+    .about-embed > h3 { font-size:1.05rem; color:var(--primary); margin:0 0 12px; }
+    .home-layout { display:grid; grid-template-columns:minmax(0,3fr) minmax(260px,2fr); gap:16px; align-items:stretch; }
+    .home-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; min-width:0; }
+    .home-card > h3 { font-size:0.95rem; color:var(--primary); margin:0 0 12px; }
+    .frazoj-card h3 { display:flex; justify-content:space-between; align-items:center; }
+    .frazoj-card { display:flex; flex-direction:column; }
+    .frazoj-card select { flex:1; width:100%; min-height:120px; font-size:0.78rem; padding:4px; border:1px solid var(--border); border-radius:6px; background:var(--card); color:var(--text); }
+    .frazoj-actions { margin-top:8px; display:flex; justify-content:flex-end; }
+    .glossary-card { grid-column:1 / -1; }
+    @media(max-width:800px) { .home-layout { grid-template-columns:1fr; } .frazoj-card select { height:200px; } }
+
+    /* ===== 词素翻转卡 ===== */
+    .morfemo-item { perspective:600px; }
+    .flip-inner { position:relative; transition:transform 0.35s ease; transform-style:preserve-3d; display:grid; }
+    .morfemo-item.flipped .flip-inner { transform:rotateY(180deg); }
+    .flip-front { grid-area:1/1; backface-visibility:hidden; -webkit-backface-visibility:hidden; display:flex; align-items:center; justify-content:center; min-width:34px; min-height:2.5rem; padding:0 3px; white-space:nowrap; }
+    .flip-back { grid-area:1/1; transform:rotateY(180deg); backface-visibility:hidden; -webkit-backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:2px 8px; white-space:nowrap; }
+    /* 未翻面时背面脱离布局(卡宽随正面);翻面后正面脱离布局(卡宽随背面 d 原文宽度自适应) */
+    .morfemo-item:not(.flipped) .flip-back { position:absolute; inset:0; }
+    .morfemo-item.flipped .flip-front { position:absolute; inset:0; }
+    .flip-back .d-text { font-size:0.9rem; font-weight:500; color:var(--text); }
+    .flip-back .b-note { font-size:0.6rem; color:var(--text-light); font-family:monospace; }
+    /* 无汉字时正面以 b 字段占位,红色标记 */
+    .morfemo-item .repl.no-repl { color:#c0392b; font-family:monospace; font-size:0.95rem; font-weight:500; }
+    .edit-btn { position:absolute; top:-7px; right:-7px; width:17px; height:17px; border:none; border-radius:50%; background:var(--accent); color:#fff; font-size:0.62rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; z-index:3; opacity:0.55; transition:var(--transition); }
+    .edit-btn:hover { opacity:1; transform:scale(1.12); }
+    .flip-hint { font-size:0.72rem; color:var(--text-light); margin:0 0 2px; }
+
+    /* ===== 词汇表社区角标 ===== */
+    .votes-badge { position:absolute; top:-4px; left:-4px; background:var(--primary-light); color:#fff; font-size:0.62rem; font-weight:700; padding:1px 6px; border-radius:8px; line-height:1.3; }
+    .my-override { position:absolute; bottom:-4px; right:-4px; background:var(--accent); color:#fff; font-size:0.62rem; font-weight:700; padding:1px 6px; border-radius:8px; line-height:1.3; }
+
+    /* ===== n>0 行式词表（普通词素每词一行，列出详细信息） ===== */
+    .glossary-rows { display:flex; flex-direction:column; }
+    .glossary-row { display:flex; align-items:baseline; gap:10px; padding:7px 4px; border-bottom:1px dashed var(--border); cursor:pointer; font-size:0.85rem; flex-wrap:wrap; transition:var(--transition); }
+    .glossary-row:hover { background:rgba(42,122,74,0.05); }
+    .glossary-row .g-base { font-family:monospace; font-weight:600; color:var(--primary); min-width:70px; }
+    .glossary-row .g-n { font-size:0.68rem; color:var(--text-light); background:var(--bg); padding:0 6px; border-radius:8px; }
+    .glossary-row .g-repl { font-size:1.05rem; font-weight:600; color:var(--primary-dark); min-width:28px; text-align:center; }
+    .glossary-row .g-repl.empty { color:var(--text-light); opacity:0.4; font-weight:300; }
+    .glossary-row .g-cands { flex:1; display:flex; flex-wrap:wrap; gap:4px; }
+    .glossary-row .g-cand { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0 8px; font-size:0.78rem; }
+    .glossary-row .g-cand.eff { border-color:var(--accent); color:var(--accent); font-weight:600; }
+    .glossary-row .g-cand small { color:var(--text-light); font-size:0.66rem; }
+    .glossary-row .g-mine { background:var(--accent); color:#fff; font-size:0.62rem; font-weight:700; padding:1px 6px; border-radius:8px; }
+
+    /* ===== 词汇弹窗候选区 ===== */
+    .popup-cands { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 10px; padding:8px; background:var(--bg); border-radius:var(--radius-sm); }
+    .popup-cand { display:inline-flex; align-items:baseline; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:2px 10px; font-size:0.85rem; }
+    .popup-cand.effective { border-color:var(--accent); color:var(--accent); font-weight:600; }
+    .popup-cand small { color:var(--text-light); font-size:0.68rem; }
+    .popup-mine { margin:-4px 0 10px; font-size:0.75rem; color:var(--accent); }
+
+    /* ===== 部分导入选择器 ===== */
+    .picker-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1200; justify-content:center; align-items:center; padding:24px 16px; }
+    .picker-overlay.open { display:flex; }
+    .picker-modal { background:var(--card); border-radius:12px; max-width:640px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.3); }
+    .picker-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
+    .picker-header h3 { margin:0; font-size:1.05rem; }
+    .picker-toolbar { display:flex; gap:8px; padding:10px 18px; border-bottom:1px dashed var(--border); flex-wrap:wrap; }
+    .picker-toolbar input { flex:1; min-width:140px; padding:6px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.85rem; }
+    .picker-list { overflow-y:auto; padding:8px 18px; flex:1; }
+    .picker-item { display:flex; align-items:center; gap:10px; padding:6px 8px; border-bottom:1px dashed var(--border); font-size:0.85rem; cursor:pointer; border-radius:6px; flex-wrap:wrap; }
+    .picker-item:hover { background:rgba(42,122,74,0.05); }
+    .picker-item.checked { background:rgba(42,122,74,0.08); }
+    .picker-item input[type=checkbox] { flex:none; }
+    .picker-key { font-family:monospace; font-weight:600; color:var(--primary); min-width:90px; }
+    .picker-cands { color:var(--text-light); font-size:0.8rem; flex:1; }
+    .picker-empty { color:var(--text-light); font-size:0.85rem; padding:18px 0; text-align:center; }
+    .picker-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 18px; border-top:1px solid var(--border); flex-wrap:wrap; }
+    .picker-footer .picker-count { font-size:0.8rem; color:var(--text-light); }
+    .picker-footer .picker-actions { display:flex; gap:8px; }
   </style>
 </head>
 
@@ -327,119 +398,127 @@
 
 <div class="glossary-popup-overlay" id="popupOverlay" onclick="closeGlossaryPopup()"></div>
 <div class="glossary-popup" id="glossaryPopup"></div>
-<!-- ===== 社区贡献页 ===== -->
-<div class="contrib-overlay" id="contribOverlay">
-  <div class="contrib-page">
-    <div class="contrib-header">
-      <h3 data-i18n="contrib_title">Kontribuoj de la komunumo</h3>
-      <div class="contrib-actions">
-        <button id="contribImportBtn" class="glossary-sort-btn" title="Enporti kontribu-pakaĵon de alia uzanto（导入贡献包）"><span data-i18n="contrib_import">Importi pakon</span></button>
-        <button id="contribExportBtn" class="glossary-sort-btn" title="Elporti komunuman bazlinion kiel community-data.json（导出基线）"><span data-i18n="contrib_export">Elporti bazlinion</span></button>
-        <button class="sidebar-close" id="contribCloseBtn" title="Fermi">&times;</button>
-      </div>
+<!-- ===== 部分导入选择器 ===== -->
+<div class="picker-overlay" id="pickerOverlay">
+  <div class="picker-modal">
+    <div class="picker-header">
+      <h3 data-i18n="picker_title">Elektu enportotaĵojn</h3>
+      <button class="sidebar-close" id="pickerCloseBtn" title="Fermi">&times;</button>
     </div>
-    <div class="contrib-stats" id="contribStats"></div>
-    <div class="contrib-list" id="contribList"></div>
-  </div>
-</div>
-<input type="file" id="contribImportFile" accept=".json,application/json" style="display:none" />
-
-<!-- ===== 关于/项目介绍面板 ===== -->
-<div class="about-overlay" id="aboutOverlay">
-  <div class="about-page">
-    <div class="about-header">
-      <h3 data-i18n="about_title">Pri E-stacio</h3>
-      <button class="sidebar-close" id="aboutCloseBtn" title="Fermi">&times;</button>
+    <div class="picker-toolbar">
+      <input type="text" id="pickerSearch" />
+      <button id="pickerSelectAll" class="glossary-sort-btn" data-i18n="picker_select_all">Ĉiuj</button>
+      <button id="pickerSelectNone" class="glossary-sort-btn" data-i18n="picker_select_none">Neniu</button>
     </div>
-    <div class="about-body">
-      <p class="about-intro" id="aboutIntro"></p>
-      <div class="about-section">
-        <h4 data-i18n="about_repo">GitHub deponejo</h4>
-        <a href="https://github.com/MingeoY/E-stacio" target="_blank" rel="noopener noreferrer" class="about-link">
-          github.com/MingeoY/E-stacio
-        </a>
+    <div class="picker-list" id="pickerList"></div>
+    <div class="picker-footer">
+      <span class="picker-count" id="pickerCount"></span>
+      <div class="picker-actions">
+        <button class="glossary-sort-btn" id="pickerCancel" data-i18n="picker_cancel">Nuligi</button>
+        <button class="btn-icon" id="pickerConfirm" data-i18n="picker_confirm">Enporti</button>
       </div>
-      <div class="about-section">
-        <h4 data-i18n="about_lib">Fraza biblioteko</h4>
-        <p id="aboutLibInfo"></p>
-      </div>
-    </div>
-    <div class="about-footer">
-      <button class="btn-icon" id="aboutCloseBtn2" data-i18n="about_close">Fermi</button>
     </div>
   </div>
 </div>
 
 <div class="app-with-sidebar" id="app">
-  <!-- ===== 抽屉式侧边栏 ===== -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h3 data-i18n="panel_title">Panelo</h3>
-      <button class="sidebar-close" id="sidebarCloseBtn" title="Fermi">&times;</button>
-    </div>
-    <div class="sidebar-section">
-      <h4><span data-i18n="glossary_section_frazoj">Frazoj</span> <button id="sidebarToggleAll" style="font-size:0.7rem;padding:1px 8px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;">Ĉiuj</button></h4>
-      <select id="sentenceSelect" multiple></select>
-    </div>
-    <!-- ===== 词汇表（移入抽屉） ===== -->
-    <div class="glossary-grid-wrap" id="glossaryGridWrap">
-      <h3><span data-i18n="glossary_title">Vortprovizo</span> <button id="glossarySortBtn" class="glossary-sort-btn" title="Ordigo: laŭ b-alfabeta / laŭ hanzi-strokoj（按b字母序 / 按汉字笔画序）">↕ b</button></h3>
-      <div class="glossary-section-label" data-i18n="glossary_n0">n=0 — Fundamentaj finaĵoj</div>
-      <div class="glossary-grid" id="glossaryGridN0"></div>
-      <div class="glossary-section-label" data-i18n="glossary_npos">n>0 — Ordinaraj morfemoj</div>
-      <div class="glossary-grid" id="glossaryGridNpos"></div>
-    </div>
-  </aside>
   <div class="main-content">
-    <!-- Toast -->
-    <div id="toast" class="toast"></div>
-
-    <!-- ===== 头部 ===== -->
+    <!-- ===== 头部:上行全局设置条,下行功能区导航 ===== -->
     <header class="header">
-      <div class="logo">
-        <span>E</span>
-        <span class="staci-ruby">站<rt>staci</rt></span>
-        <span>o</span>
-        <span class="sub" data-i18n="subtitle"> </span>
+      <div class="settings-bar">
+        <div class="logo">
+          <span>E</span>
+          <span class="staci-ruby">站<rt>staci</rt></span>
+          <span>o</span>
+          <span class="sub" data-i18n="subtitle"> </span>
+        </div>
+        <div class="mode-switch" id="modeSwitch">
+          <button class="mode-btn active" data-mode="guest" data-i18n="mode_guest">Sensaluti</button>
+          <button class="mode-btn" data-mode="user" data-i18n="mode_user">Ensaluti</button>
+          <button class="mode-btn admin" data-mode="admin" data-i18n="mode_admin">Administri</button>
+        </div>
+        <label>
+          <span data-i18n="label_lang">Lingvo</span>
+          <select id="langSelect">
+            <option value="zh" data-i18n="lang_zh">Ĉina</option>
+            <option value="ja" data-i18n="lang_ja">Japana</option>
+            <option value="en" data-i18n="lang_en">Angla</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="label_merge">Pluralo/akuzativo</span>
+          <span class="toggle-group">
+            <button class="active" data-merge="false" data-i18n="merge_split">Divida</button>
+            <button data-merge="true" data-i18n="merge_merge">Kuniga</button>
+          </span>
+        </label>
+        <div class="user-info" id="userInfo" style="display:none;">
+          <span class="user-badge" id="userBadge"></span>
+        </div>
       </div>
-      <div class="mode-switch" id="modeSwitch">
-        <button class="mode-btn active" data-mode="guest" data-i18n="mode_guest">Sensaluti</button>
-        <button class="mode-btn" data-mode="user" data-i18n="mode_user">Ensaluti</button>
-        <button class="mode-btn admin" data-mode="admin" data-i18n="mode_admin">Administri</button>
-      </div>
-      <div class="user-info" id="userInfo" style="display:none;">
-        <span class="user-badge" id="userBadge"></span>
-      </div>
-      <button class="btn-icon about-btn" id="aboutBtn" data-i18n="about_btn">ℹ Pri</button>
     </header>
 
-    <!-- ===== 设置栏 ===== -->
-    <div class="settings">
-      <button class="btn-icon secondary" id="drawerToggle" title="Frazoj / Vortprovizo">☰ <span data-i18n="panel_title">Panelo</span></button>
-      <button class="btn-icon secondary" id="contribBtn" title="Kontribuoj de la komunumo">👥 <span data-i18n="contrib_btn">Kontribuoj</span></button>
-      <label>
-        <span data-i18n="label_lang">Lingvo</span>
-        <select id="langSelect">
-          <option value="zh" data-i18n="lang_zh">Ĉina</option>
-          <option value="ja" data-i18n="lang_ja">Japana</option>
-          <option value="en" data-i18n="lang_en">Angla</option>
-        </select>
-      </label>
-      <label>
-        <span data-i18n="label_merge">Pluralo/akuzativo</span>
-        <span class="toggle-group">
-          <button class="active" data-merge="false" data-i18n="merge_split">Divida</button>
-          <button data-merge="true" data-i18n="merge_merge">Kuniga</button>
-        </span>
-      </label>
-      <button class="btn-icon" id="speakBtn" data-i18n="btn_speak">Aŭskulti</button>
-      <button class="btn-icon secondary" id="resetBtn" data-i18n="btn_reset">Restarigi</button>
-    </div>
+    <!-- 区域1:项目介绍 + 例句选择(可折叠) -->
+    <details class="fold" id="foldIntro" open>
+      <summary><span data-i18n="sec_intro">Enkonduko kaj frazo-elekto</span></summary>
+      <div class="home-layout">
+        <!-- 左上:关于 -->
+        <div class="home-card about-card">
+          <div class="about-embed">
+            <p class="about-intro" id="aboutIntro"></p>
+            <div class="about-section">
+              <h4 data-i18n="about_repo">GitHub deponejo</h4>
+              <a href="https://github.com/MingeoY/E-stacio" target="_blank" rel="noopener noreferrer" class="about-link">
+                github.com/MingeoY/E-stacio
+              </a>
+            </div>
+            <div class="about-section">
+              <h4 data-i18n="about_online">Reta versio (GitHub Pages)</h4>
+              <a href="https://mingeoy.github.io/E-stacio/" target="_blank" rel="noopener noreferrer" class="about-link">
+                https://mingeoy.github.io/E-stacio/
+              </a>
+            </div>
+            <div class="about-section">
+              <h4 data-i18n="about_data_structure">Datuma strukturo</h4>
+              <p id="aboutDataStructure" class="about-text"></p>
+            </div>
+            <div class="about-section">
+              <h4 data-i18n="about_usage">Uzinstrukcio</h4>
+              <p id="aboutUsage" class="about-text"></p>
+            </div>
+            <div class="about-section">
+              <h4 data-i18n="about_thanks">Dankoj</h4>
+              <p id="aboutThanks" class="about-text"></p>
+            </div>
+            <div class="about-section">
+              <h4 data-i18n="about_stats">Statistikoj</h4>
+              <p id="aboutCounts"></p>
+            </div>
+          </div>
+        </div>
+        <!-- 右上:例句面板(多选列表;选择后跳转例句库) -->
+        <div class="home-card frazoj-card">
+          <h3><span data-i18n="glossary_section_frazoj">Frazoj</span> <button id="sidebarToggleAll" class="glossary-sort-btn">Ĉiuj</button></h3>
+          <select id="sentenceSelect" multiple></select>
+          <div class="frazoj-actions">
+            <button class="btn-icon secondary" id="gotoSentenceBtn" data-i18n="goto_sentence">▶ Iri al frazo</button>
+          </div>
+        </div>
+      </div>
+      </details>
+
+      <!-- 区域2:例句卡片(可折叠) -->
+      <details class="fold" id="foldFrazaro" open>
+      <summary><span data-i18n="sec_frazaro">Frazoj</span></summary>
+      <div class="settings">
+        <button class="btn-icon" id="speakBtn" data-i18n="btn_speak">Aŭskulti</button>
+        <button class="btn-icon secondary" id="resetBtn" data-i18n="btn_reset">Restarigi</button>
+      </div>
 
     <!-- ===== 句子卡片 ===== -->
     <div class="sentence-card" id="sentenceCard">
       <div class="sentence-number" id="sentenceNumber">#1</div>
+      <div class="flip-hint" data-i18n="flip_hint">Alklaku por turni la karton · ✎ redaktas</div>
       <div class="morfemoj-row" id="morfemojRow"></div>
       <div class="sentence-translation" id="sentenceTranslation">
         <span class="lang-tag" data-i18n="translation_label">Traduko</span>
@@ -499,12 +578,38 @@
           <button class="btn-icon secondary" id="copyBtnB" data-i18n="copy_b" title="格式B: 括号标注原形" style="padding:2px 12px;font-size:0.75rem">📋 B</button>
         </div>
     </footer>
+    </details>
+
+    <!-- 区域3:词汇表 + 社区贡献(可折叠,details 本身为卡片) -->
+    <details class="fold home-card glossary-card" id="glossaryCard" open>
+      <summary><span data-i18n="glossary_community_title">Vortprovizo · Komunumaj kontribuoj</span></summary>
+      <div class="contrib-header">
+        <div class="contrib-actions">
+          <button id="glossarySortBtn" class="glossary-sort-btn" title="Ordigo: laŭ b-alfabeta / laŭ hanzi-strokoj（按b字母序 / 按汉字笔画序）">↕ b</button>
+          <button id="contribImportBtn" class="glossary-sort-btn" title="Enporti kontribu-pakaĵon de alia uzanto（导入贡献包）"><span data-i18n="contrib_import">Importi pakon</span></button>
+          <button id="contribExportBtn" class="glossary-sort-btn" title="Elporti komunuman bazlinion kiel community-data.json（导出基线）"><span data-i18n="contrib_export">Elporti bazlinion</span></button>
+          <button id="prefExportBtn" class="glossary-sort-btn" title="Elporti miajn preferojn（导出我的偏好包）"><span data-i18n="pref_export">Elporti preferojn</span></button>
+          <button id="prefImportBtn" class="glossary-sort-btn" title="Enporti prefero-pakaĵon de alia uzanto（导入他人偏好包）"><span data-i18n="pref_import">Enporti preferojn</span></button>
+        </div>
+      </div>
+      <div class="contrib-stats" id="contribStats"></div>
+      <div class="glossary-grid-wrap" id="glossaryGridWrap">
+        <div class="glossary-section-label" data-i18n="glossary_n0">n=0 — Fundamentaj finaĵoj</div>
+        <div class="glossary-grid" id="glossaryGridN0"></div>
+        <div class="glossary-section-label" data-i18n="glossary_npos">n>0 — Ordinaraj morfemoj</div>
+        <div class="glossary-rows" id="glossaryGridNpos"></div>
+      </div>
+    </details>
 
   </div> <!-- /main-content -->
 
 </div> <!-- /app -->
 
-<script src="e-stacio-data.js?v=20261011f"></script>
+<div id="toast" class="toast"></div>
+<input type="file" id="contribImportFile" accept=".json,application/json" style="display:none" />
+<input type="file" id="prefImportFile" accept=".json,application/json" style="display:none" />
+
+<script src="e-stacio-data.js?v=20261014g"></script>
 <script>
 // ============================================================
 // 数据验证 — e-stacio-data.js 提供 I18N, SENTENCES_RAW 等常量
@@ -801,6 +906,14 @@ function saveState() {
       mode: APP.mode,
       currentIndex: APP.currentIndex,
       currentUser: APP.currentUser,
+      folds: (function() {
+        var f = {};
+        ['foldIntro', 'foldFrazaro', 'glossaryCard'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) f[id] = el.open;
+        });
+        return f;
+      })(),
     };
     localStorage.setItem(STATE_KEY, JSON.stringify(data));
   } catch (_) {}
@@ -856,6 +969,13 @@ function loadState() {
     APP.mode = data.mode || 'guest';
     APP.currentIndex = data.currentIndex || 0;
     APP.currentUser = data.currentUser || null;
+    // 恢复三个主区域的折叠状态(旧存档无此字段时保持默认展开)
+    if (data.folds) {
+      Object.keys(data.folds).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && typeof data.folds[id] === 'boolean') el.open = data.folds[id];
+      });
+    }
     // 安全校验:若保存的是 admin 模式但当前用户不在白名单,回退为 guest
     if (APP.mode === 'admin' && !isAdminUser(APP.currentUser)) {
       APP.mode = 'guest';
@@ -967,42 +1087,37 @@ function compareGlossary(a, b) {
   return a.b.localeCompare(b.b) || a.n - b.n;
 }
 
-// ===== 社区贡献页:直接查看社区的全部贡献数据 =====
-function openContribPage() {
-  loadPublicRepl();          // 重新读取,获取其他用户的最新公开贡献
-  mergeGlobalReplacements();
-  renderContribPage();
-  document.getElementById('contribOverlay').classList.add('open');
-  updateGlossary();          // 公开库若有变化,词汇表同步刷新
+// ===== 单页滚动定位:跳转到例句卡片区 =====
+function scrollToSentences() {
+  var el = document.getElementById('sentenceCard');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function closeContribPage() {
-  document.getElementById('contribOverlay').classList.remove('open');
-}
-
-// ===== 关于/项目介绍面板 =====
-function openAboutPage() {
-  const intro = document.getElementById('aboutIntro');
-  const info = document.getElementById('aboutLibInfo');
-  if (intro) {
-    intro.textContent = I18N.about_intro[APP.lang] || I18N.about_intro.eo;
+// 关于页动态内容(简介/例句库信息/数据结构/指南/致谢/统计)
+function updateAboutPage() {
+  var intro = document.getElementById('aboutIntro');
+  if (intro) intro.textContent = I18N.about_intro[APP.lang] || I18N.about_intro.eo;
+  var ds = document.getElementById('aboutDataStructure');
+  if (ds) ds.textContent = I18N.about_data_structure_text[APP.lang] || I18N.about_data_structure_text.eo;
+  var us = document.getElementById('aboutUsage');
+  if (us) us.textContent = I18N.about_usage_text[APP.lang] || I18N.about_usage_text.eo;
+  var th = document.getElementById('aboutThanks');
+  if (th) th.textContent = I18N.about_thanks_text[APP.lang] || I18N.about_thanks_text.eo;
+  var counts = document.getElementById('aboutCounts');
+  if (counts) {
+    var tpl2 = I18N.about_counts[APP.lang] || I18N.about_counts.eo;
+    counts.textContent = tpl2
+      .replace('{frazoj}', APP.sentences.length)
+      .replace('{slosiloj}', Object.keys(APP.publicContrib || {}).length);
   }
-  if (info) {
-    const tpl = I18N.about_lib_info[APP.lang] || I18N.about_lib_info.eo;
-    info.textContent = tpl.replace('{n}', APP.sentences.length);
-  }
-  document.getElementById('aboutOverlay').classList.add('open');
-}
-function closeAboutPage() {
-  document.getElementById('aboutOverlay').classList.remove('open');
 }
 
-function renderContribPage() {
-  var list = document.getElementById('contribList');
+// 社区贡献统计行(并入主页词表区;各候选明细见词条点击弹窗)
+function renderContribStats() {
   var stats = document.getElementById('contribStats');
-  if (!list || !stats) return;
+  if (!stats) return;
   var contrib = APP.publicContrib || {};
-  var keys = Object.keys(contrib).sort();
+  var keys = Object.keys(contrib);
   var totalVotes = 0, users = {};
   keys.forEach(function(k) {
     Object.values(contrib[k]).forEach(function(info) {
@@ -1011,49 +1126,12 @@ function renderContribPage() {
     });
   });
   stats.textContent = keys.length + ' ŝlosiloj · ' + totalVotes + ' voĉoj · ' + Object.keys(users).length + ' uzantoj';
-  list.innerHTML = '';
-  if (!keys.length) {
-    var empty = document.createElement('div');
-    empty.className = 'contrib-empty';
-    empty.setAttribute('data-i18n', 'contrib_empty');
-    empty.textContent = 'Neniu kontribuo ankoraŭ.';
-    list.appendChild(empty);
-    updateI18n();
-    return;
-  }
-  keys.forEach(function(k) {
-    var candidates = Object.entries(contrib[k]).sort(function(a, b) {
-      return b[1].c - a[1].c || a[0].localeCompare(b[0]);
-    });
-    var group = document.createElement('div');
-    group.className = 'contrib-group';
-    var head = document.createElement('div');
-    head.className = 'contrib-key';
-    head.textContent = k;
-    group.appendChild(head);
-    candidates.forEach(function(pair) {
-      var h = pair[0], info = pair[1];
-      var us = Object.keys(info.u || {});
-      var isEff = APP.publicRepl[k] === h;   // 当前公开有效值
-      var row = document.createElement('div');
-      row.className = 'contrib-row' + (isEff ? ' effective' : '');
-      row.innerHTML = '<span class="contrib-hanzi">' + h + '</span>' +
-        '<span class="contrib-meta">×' + info.c + (us.length ? ' · ' + us.join(', ') : '') + '</span>' +
-        (isEff ? '<span class="contrib-badge" data-i18n="contrib_effective">efektiva</span>' : '');
-      group.appendChild(row);
-    });
-    list.appendChild(group);
-  });
-  updateI18n();
 }
 
 function updateGlossary() {
-  var selected = getSelectedIds();
+  // 主页映射预览始终基于全量例句(不随抽屉选择缩小)
   var map = {};
-  (selected || APP.sentences).forEach(function(id) {
-    var s;
-    if (typeof id === 'object') { s = id; } else { s = APP.sentences.find(function(x) { return x.id === id; }); }
-    if (!s) return;
+  APP.sentences.forEach(function(s) {
     s.morfemoj.forEach(function(m) {
       if (!APP.mergeMode && m.n === 0) {
         // 拆分模式:n=0 部分按拆分字符展示(char|-1 命名空间),与合并模式的整体词尾互不影响
@@ -1075,7 +1153,13 @@ function updateGlossary() {
   var n0 = entries.filter(function(e) { return e.n <= 0; });
   var nP = entries.filter(function(e) { return e.n > 0; });
   renderGlossaryGrid('glossaryGridN0', n0, false);
-  renderGlossaryGrid('glossaryGridNpos', nP, true);
+  renderGlossaryRows('glossaryGridNpos', nP);
+}
+
+// 词汇表条目对应的社区贡献键(与 getGlobalRepl/computeGlobalKey 同规则:n>0 用 b|n;n=0 合并用 b|0;拆分字符用 b|-1)
+function glossaryContribKey(e) {
+  if (e.n > 0) return e.b + '|' + e.n;
+  return e.b.toLowerCase() + '|' + (e.n === 0 ? '0' : '-1');
 }
 
 function renderGlossaryGrid(gridId, entries, showN) {
@@ -1084,11 +1168,51 @@ function renderGlossaryGrid(gridId, entries, showN) {
   grid.innerHTML = '';
   entries.forEach(function(e) {
     var repl = getGlobalRepl(e.b, e.n);
+    var key = glossaryContribKey(e);
+    var eff = APP.publicRepl[key];
+    var slot = eff ? APP.publicContrib[key] : null;
+    var votes = slot && slot[eff] ? slot[eff].c : 0;
+    var mine = Object.prototype.hasOwnProperty.call(APP.privateGlobalReplacements, key);
     var div = document.createElement('div');
     div.className = 'glossary-item';
-    div.innerHTML = '<span class="glyph">' + e.b + '</span><span class="repl' + (repl?'':' empty') + '">' + (repl || '?') + '</span>' + (showN ? '<span class="n-badge">' + e.n + '</span>' : '');
+    div.innerHTML = '<span class="glyph">' + e.b + '</span><span class="repl' + (repl?'':' empty') + '">' + (repl || '?') + '</span>' +
+      (showN ? '<span class="n-badge">' + e.n + '</span>' : '') +
+      (votes > 0 ? '<span class="votes-badge" title="' + eff + ' ×' + votes + '">×' + votes + '</span>' : '') +
+      (mine ? '<span class="my-override" title="' + key + '">我</span>' : '');
     div.addEventListener('click', function() { showGlossaryPopup(e.b, e.n, e.sentIds); });
     grid.appendChild(div);
+  });
+}
+
+// n>0 普通词素:每词一行,列出 b / n / 当前汉字 / 社区候选(票数·贡献者·生效✓) / 我的覆盖
+function renderGlossaryRows(containerId, entries) {
+  var box = document.getElementById(containerId);
+  if (!box) return;
+  box.innerHTML = '';
+  entries.forEach(function(e) {
+    var repl = getGlobalRepl(e.b, e.n);
+    var key = glossaryContribKey(e);
+    var slot = APP.publicContrib[key] || {};
+    var cand = Object.entries(slot).map(function(pair) {
+      var times = Object.values(pair[1].u || {});
+      return { h: pair[0], c: pair[1].c, latest: times.length ? Math.max.apply(null, times) : 0, users: Object.keys(pair[1].u || {}) };
+    }).sort(function(x, y) { return y.c - x.c || y.latest - x.latest; });
+    var mine = Object.prototype.hasOwnProperty.call(APP.privateGlobalReplacements, key);
+    var row = document.createElement('div');
+    row.className = 'glossary-row';
+    var html = '<span class="g-base">' + e.b + '</span>' +
+      '<span class="g-n">n=' + e.n + '</span>' +
+      '<span class="g-repl' + (repl ? '' : ' empty') + '">' + (repl || '?') + '</span>' +
+      '<span class="g-cands">';
+    cand.forEach(function(it) {
+      var isEff = APP.publicRepl[key] === it.h;
+      html += '<span class="g-cand' + (isEff ? ' eff' : '') + '">' + it.h + ' ×' + it.c +
+        (isEff ? ' ✓' : '') + (it.users.length ? ' <small>' + it.users.join(', ') + '</small>' : '') + '</span>';
+    });
+    html += '</span>' + (mine ? '<span class="g-mine" title="' + key + '">我</span>' : '');
+    row.innerHTML = html;
+    row.addEventListener('click', function() { showGlossaryPopup(e.b, e.n, e.sentIds); });
+    box.appendChild(row);
   });
 }
 
@@ -1097,7 +1221,31 @@ function showGlossaryPopup(b, n, sentIds) {
   var popup = document.getElementById('glossaryPopup');
   if (!overlay || !popup) return;
   var title = 'b:' + b + (n > 0 ? ' n=' + n : '');
+  var key = glossaryContribKey({ b: b, n: n });
   var html = '<button class="close-popup" onclick="closeGlossaryPopup()">&times;</button><h4>' + title + '</h4>';
+
+  // 社区候选(复用贡献页排序:票数降序、同票取最近贡献)
+  var slot = APP.publicContrib[key] || {};
+  var cand = Object.entries(slot).map(function(pair) {
+    var times = Object.values(pair[1].u || {});
+    return { h: pair[0], c: pair[1].c, latest: times.length ? Math.max.apply(null, times) : 0, users: Object.keys(pair[1].u || {}) };
+  }).sort(function(x, y) { return y.c - x.c || y.latest - x.latest; });
+  if (cand.length) {
+    var candsLabel = I18N.popup_candidates ? (I18N.popup_candidates[APP.lang] || I18N.popup_candidates.eo) : 'Kandidatoj';
+    html += '<div style="font-size:0.72rem;color:var(--text-light);margin-bottom:4px;">' + candsLabel + '</div><div class="popup-cands">';
+    cand.forEach(function(it) {
+      var isEff = APP.publicRepl[key] === it.h;
+      html += '<span class="popup-cand' + (isEff ? ' effective' : '') + '">' + it.h + ' ×' + it.c +
+        (isEff ? ' ✓' : '') + (it.users.length ? ' <small>' + it.users.join(', ') + '</small>' : '') + '</span>';
+    });
+    html += '</div>';
+  }
+  var myVal = APP.privateGlobalReplacements[key];
+  if (myVal) {
+    var mineLabel = I18N.popup_my_choice ? (I18N.popup_my_choice[APP.lang] || I18N.popup_my_choice.eo) : 'Mia elekto';
+    html += '<div class="popup-mine">' + mineLabel + ': ' + myVal + '</div>';
+  }
+
   var lang = APP.lang || 'zh';
   sentIds.forEach(function(id) {
     var s = APP.sentences.find(function(x) { return x.id === id; });
@@ -1108,12 +1256,12 @@ function showGlossaryPopup(b, n, sentIds) {
     html += '<div class="popup-sent" style="cursor:pointer;" data-jump-id="' + (id + 1) + '"><span class="sid">#' + (id + 1) + '</span><span class="stext">' + text + '</span><div class="strans">' + trans + '</div></div>';
   });
   popup.innerHTML = html;
-  // 绑定点击跳转
+  // 绑定点击跳转:定位例句并滚动到卡片区
   popup.querySelectorAll('[data-jump-id]').forEach(function(row) {
     row.addEventListener('click', function() {
       goToSentence(parseInt(this.getAttribute('data-jump-id')));
       closeGlossaryPopup();
-      toggleDrawer(true);  // 跳转后收起抽屉,聚焦主页面
+      scrollToSentences();
     });
   });
   overlay.classList.add('open');
@@ -1129,8 +1277,6 @@ function closeGlossaryPopup() {
 // 8. 渲染
 // ============================================================
 function renderAll() {
-  updateGlossary();
-
   renderSentence();
 
   renderSettings();
@@ -1139,8 +1285,12 @@ function renderAll() {
   updateNavButtons();
   updateModeButtons();
 
-  updateI18n();
+  // 主页含关于区与社区贡献词表,每次渲染同步动态内容
+  updateAboutPage();
+  renderContribStats();
+
   updateGlossary();
+  updateI18n();
 }
 
 function updateI18n() {
@@ -1196,27 +1346,53 @@ function renderSentence() {
     container.dataset.origIdx = item.origIdx;
     container.dataset.subIdx = item.subIdx !== undefined ? item.subIdx : '';
 
-    // 拉丁注音 (上方)
-    const glyph = document.createElement('div');
-    glyph.className = 'glyph';
-    glyph.textContent = item.d;
-    container.appendChild(glyph);
+    // 翻转卡结构:正面为替换汉字,背面为 d 原文 + 小字 b(系统一律按 b 字段处理)
+    const inner = document.createElement('div');
+    inner.className = 'flip-inner';
 
-    // 汉字主体 (下方)
+    const front = document.createElement('div');
+    front.className = 'flip-front';
     const replDiv = document.createElement('div');
     replDiv.className = 'repl';
     const repl = getReplacement(sId, item.origIdx, item.subIdx);
     if (repl) {
       replDiv.textContent = repl;
-      replDiv.classList.remove('empty');
     } else {
-      replDiv.textContent = '？';
-      replDiv.classList.add('empty');
+      // 无汉字时以 b 字段暂为占位,红色标记(系统一律按 b 处理)
+      replDiv.textContent = item.b;
+      replDiv.classList.add('no-repl');
     }
-    container.appendChild(replDiv);
+    front.appendChild(replDiv);
 
-    container.addEventListener('click', () => {
+    const back = document.createElement('div');
+    back.className = 'flip-back';
+    const dDiv = document.createElement('div');
+    dDiv.className = 'd-text';
+    dDiv.textContent = item.d;
+    const bDiv = document.createElement('div');
+    bDiv.className = 'b-note';
+    bDiv.textContent = item.b + (item.n !== undefined ? '|' + item.n : '');
+    back.appendChild(dDiv);
+    back.appendChild(bDiv);
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    container.appendChild(inner);
+
+    // ✎ 编辑按钮:阻止冒泡,不触发翻面
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn';
+    editBtn.textContent = '✎';
+    editBtn.title = I18N.edit_morpheme ? (I18N.edit_morpheme[APP.lang] || I18N.edit_morpheme.eo) : 'Redakti';
+    editBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       openEditor(sId, item.origIdx, item.subIdx);
+    });
+    container.appendChild(editBtn);
+
+    // 单击卡片翻面(翻转态仅渲染期状态,不持久化)
+    container.addEventListener('click', () => {
+      container.classList.toggle('flipped');
     });
 
     row.appendChild(container);
@@ -1637,19 +1813,6 @@ function getGlobalRepl(b, n) {
 }
 
 // ============================================================
-// 抽屉式侧边栏
-// ============================================================
-function toggleDrawer(forceClose) {
-  var sb = document.getElementById('sidebar');
-  var ov = document.getElementById('drawerOverlay');
-  if (!sb || !ov) return;
-  var isOpen = sb.classList.contains('open');
-  var shouldOpen = forceClose ? false : !isOpen;
-  sb.classList.toggle('open', shouldOpen);
-  ov.classList.toggle('open', shouldOpen);
-}
-
-// ============================================================
 // 12. 模式切换
 // ============================================================
 function setMode(mode) {
@@ -1674,6 +1837,8 @@ function setMode(mode) {
       return;
     }
     APP.adminEditing = false; APP.adminEditTarget = null;
+    // 管理面板位于例句卡片区,进入管理模式时滚动过去
+    scrollToSentences();
     // 管理模式沿用当前用户数据,无需重载
   } else if (mode === 'user') {
     const name = prompt('Enigu uzantnomon:');
@@ -1790,23 +1955,156 @@ function importSentencesFile(file) {
   reader.readAsText(file);
 }
 
-// 导入社区贡献包:仅合并贡献数据(基线 contrib / 旧备份 publicContrib),不动例句与私有替换
+// 导入社区贡献包:解析后先打开部分导入选择器(可勾选子集),确认后才合并;不动例句与私有替换
+// 兼容两种来源:基线文件 community-data.json 用 contrib 字段,旧全量备份用 publicContrib
 function importContribFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      // 兼容两种来源:基线文件 community-data.json 用 contrib 字段,旧全量备份用 publicContrib
       const raw = data.publicContrib || data.contrib;
       if (raw && typeof raw === 'object') {
-        const added = mergeContribIntoLocal(normalizeContribKeys(raw));
-        mergeGlobalReplacements();
-        renderAll();
-        renderContribPage();  // 贡献页当前已打开,刷新列表
-        showToast('Kontribuo enportita: +' + added + ' ŝlosiloj', 'success');
+        openImportPicker(normalizeContribKeys(raw));
       } else {
         showToast('Neniu kontribua datumo en dosiero', 'error');
       }
+    } catch (err) { showToast('Eraro: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+// ===== 部分导入选择器 =====
+function openImportPicker(contrib) {
+  APP._pendingImport = { contrib: contrib, checked: {} };
+  Object.keys(contrib).forEach(function(k) { APP._pendingImport.checked[k] = true; });  // 默认全选
+  var search = document.getElementById('pickerSearch');
+  if (search) {
+    search.value = '';
+    search.placeholder = I18N.picker_search ? (I18N.picker_search[APP.lang] || I18N.picker_search.eo) : '…';
+  }
+  renderPickerList();
+  document.getElementById('pickerOverlay').classList.add('open');
+}
+
+function closeImportPicker() {
+  APP._pendingImport = null;
+  var overlay = document.getElementById('pickerOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function renderPickerList() {
+  var list = document.getElementById('pickerList');
+  var st = APP._pendingImport;
+  if (!list || !st) return;
+  var q = (document.getElementById('pickerSearch').value || '').toLowerCase();
+  var keys = Object.keys(st.contrib).sort().filter(function(k) {
+    if (!q) return true;
+    if (k.toLowerCase().indexOf(q) >= 0) return true;
+    return Object.keys(st.contrib[k]).some(function(h) { return h.toLowerCase().indexOf(q) >= 0; });
+  });
+  list.innerHTML = '';
+  keys.forEach(function(k) {
+    var hanziMap = st.contrib[k];
+    var top = Object.entries(hanziMap).sort(function(a, b) { return b[1].c - a[1].c; })[0];
+    var checked = !!st.checked[k];
+    var row = document.createElement('div');
+    row.className = 'picker-item' + (checked ? ' checked' : '');
+    var users = top && top[1].u ? Object.keys(top[1].u) : [];
+    row.innerHTML = '<input type="checkbox"' + (checked ? ' checked' : '') + ' />' +
+      '<span class="picker-key">' + k + '</span>' +
+      '<span class="picker-cands">' + Object.keys(hanziMap).map(function(h) { return h + (h === (top ? top[0] : '') ? ' ×' + top[1].c : ''); }).join(' · ') + (users.length ? ' <small>(' + users.join(', ') + ')</small>' : '') + '</span>';
+    var cb = row.querySelector('input');
+    cb.addEventListener('change', function(e) {
+      st.checked[k] = e.target.checked;
+      row.classList.toggle('checked', e.target.checked);
+      updatePickerCount();
+    });
+    row.addEventListener('click', function(e) {
+      if (e.target === cb) return;
+      cb.checked = !cb.checked;
+      st.checked[k] = cb.checked;
+      row.classList.toggle('checked', cb.checked);
+      updatePickerCount();
+    });
+    list.appendChild(row);
+  });
+  if (!keys.length) {
+    var empty = document.createElement('div');
+    empty.className = 'picker-empty';
+    empty.setAttribute('data-i18n', 'picker_empty');
+    empty.textContent = I18N.picker_empty ? (I18N.picker_empty[APP.lang] || I18N.picker_empty.eo) : 'Neniu rezulto';
+    list.appendChild(empty);
+  }
+  updatePickerCount();
+  updateI18n();
+}
+
+function setPickerAll(val) {
+  var st = APP._pendingImport;
+  if (!st) return;
+  Object.keys(st.checked).forEach(function(k) { st.checked[k] = val; });
+  renderPickerList();
+}
+
+function updatePickerCount() {
+  var st = APP._pendingImport;
+  var el = document.getElementById('pickerCount');
+  if (!el) return;
+  var total = st ? Object.keys(st.contrib).length : 0;
+  var n = 0;
+  if (st) Object.keys(st.checked).forEach(function(k) { if (st.checked[k]) n++; });
+  el.textContent = n + ' / ' + total;
+}
+
+// 确认导入:仅合并勾选子集(复用 mergeContribIntoLocal 合并链)
+function confirmImportPicker() {
+  var st = APP._pendingImport;
+  if (!st) return;
+  var subset = {};
+  Object.keys(st.checked).forEach(function(k) {
+    if (st.checked[k] && st.contrib[k]) subset[k] = st.contrib[k];
+  });
+  var added = mergeContribIntoLocal(subset);
+  mergeGlobalReplacements();
+  closeImportPicker();
+  renderAll();
+  showToast('Kontribuo enportita: +' + added + ' ŝlosiloj', 'success');
+}
+
+// ===== 偏好包:导出/导入当前用户的私有汉字映射 =====
+function exportPreferencePack() {
+  var map = APP.privateGlobalReplacements || {};
+  var n = Object.keys(map).length;
+  if (!n) { showToast('Neniu prefero por elporti', 'error'); return; }
+  var user = APP.currentUser || 'sensaluti';
+  var data = { type: 'preference', v: 1, user: user, exportedAt: new Date().toISOString(), map: map };
+  downloadJSON(data, 'e-stacio-preference-' + user + '.json');
+  showToast('Prefero-pako elportita (' + n + ' ŝlosiloj)', 'success');
+}
+
+// 导入他人偏好包:逐键以原用户名记一票(复用 recordContribution 合并链)
+function importPreferenceFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data || data.type !== 'preference' || !data.map || typeof data.map !== 'object') {
+        showToast('Neniu prefera datumo en dosiero', 'error');
+        return;
+      }
+      var user = data.user || 'uzanto';
+      var n = 0;
+      Object.entries(data.map).forEach(function(pair) {
+        var k = pair[0], h = pair[1];
+        if (typeof h === 'string' && h) {
+          recordContribution(cleanReplKey(k), h, user);
+          n++;
+        }
+      });
+      mergeGlobalReplacements();
+      renderAll();
+      var tpl = I18N.pref_imported;
+      showToast((tpl[APP.lang] || tpl.eo).replace('{n}', n).replace('{u}', user), 'success');
     } catch (err) { showToast('Eraro: ' + err.message, 'error'); }
   };
   reader.readAsText(file);
@@ -1868,27 +2166,49 @@ function init() {
 
   });
 
-  // 抽屉切换
-  document.getElementById('drawerToggle').addEventListener('click', () => toggleDrawer());
-  document.getElementById('sidebarCloseBtn').addEventListener('click', () => toggleDrawer(true));
-  document.getElementById('drawerOverlay').addEventListener('click', () => toggleDrawer(true));
-
-  // 社区贡献页
-  document.getElementById('contribBtn').addEventListener('click', openContribPage);
-  document.getElementById('contribCloseBtn').addEventListener('click', closeContribPage);
-  // 关于面板
-  document.getElementById('aboutBtn').addEventListener('click', openAboutPage);
-  document.getElementById('aboutCloseBtn').addEventListener('click', closeAboutPage);
-  document.getElementById('aboutCloseBtn2').addEventListener('click', closeAboutPage);
-  document.getElementById('aboutOverlay').addEventListener('click', (e) => {
-    if (e.target.id === 'aboutOverlay') closeAboutPage();
+  // 三个主区域的折叠状态持久化
+  [['foldIntro', 'intro'], ['foldFrazaro', 'frazaro'], ['glossaryCard', 'glosaro']].forEach(function(p) {
+    var el = document.getElementById(p[0]);
+    if (el) el.addEventListener('toggle', saveState);
   });
+
+  // 例句面板:跳转到第一个选中的例句
+  document.getElementById('gotoSentenceBtn').addEventListener('click', () => {
+    var sel = document.getElementById('sentenceSelect');
+    var first = Array.from(sel.options).find(o => o.selected);
+    if (first) {
+      goToSentence(parseInt(first.value) + 1);
+      scrollToSentences();
+    } else {
+      var m = I18N.select_sentence_first;
+      showToast(m ? (m[APP.lang] || m.eo) : 'Unue elektu frazon', 'error');
+    }
+  });
+
+  // 社区互动:贡献包 / 偏好包 导入导出
   document.getElementById('contribImportBtn').addEventListener('click', () => document.getElementById('contribImportFile').click());
   document.getElementById('contribImportFile').addEventListener('change', (e) => {
     if (e.target.files.length > 0) importContribFile(e.target.files[0]);
     e.target.value = '';
   });
   document.getElementById('contribExportBtn').addEventListener('click', exportCommunityBaseline);
+  document.getElementById('prefExportBtn').addEventListener('click', exportPreferencePack);
+  document.getElementById('prefImportBtn').addEventListener('click', () => document.getElementById('prefImportFile').click());
+  document.getElementById('prefImportFile').addEventListener('change', (e) => {
+    if (e.target.files.length > 0) importPreferenceFile(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  // 部分导入选择器
+  document.getElementById('pickerCloseBtn').addEventListener('click', closeImportPicker);
+  document.getElementById('pickerCancel').addEventListener('click', closeImportPicker);
+  document.getElementById('pickerConfirm').addEventListener('click', confirmImportPicker);
+  document.getElementById('pickerSelectAll').addEventListener('click', () => setPickerAll(true));
+  document.getElementById('pickerSelectNone').addEventListener('click', () => setPickerAll(false));
+  document.getElementById('pickerSearch').addEventListener('input', renderPickerList);
+  document.getElementById('pickerOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'pickerOverlay') closeImportPicker();
+  });
 
   // 词汇表排序切换
   var sortBtn = document.getElementById('glossarySortBtn');
@@ -1962,8 +2282,7 @@ function init() {
     if (e.key === ' ' && !e.repeat) { e.preventDefault(); speakCurrent(); }
   });
 
-  updateGlossary();
-  renderAll();
+  renderAll();  // 单页结构,整页一次渲染
   showToast('Bonvenon al E-stacio · 世语驿站', 'success');
   fetchCommunityBaseline();  // 异步合并仓库社区基线,失败不影响使用
   setTimeout(() => {
